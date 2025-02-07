@@ -26,6 +26,7 @@ type config struct {
 	}
 }
 
+// Application struct (holds app configuration)
 type application struct {
 	config        config
 	infoLog       *log.Logger
