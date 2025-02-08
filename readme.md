@@ -9,9 +9,10 @@ Learn how to build a secure ecommerce application with Go
 
 ### Dependencies
 - [Chi Router](https://github.com/go-chi/chi/v5) - routing and middleware
+- [GoDotEnv](https://github.com/joho/godotenv) - loads environment variables from .env files
 
 ### UI Components
-
+- [Stripe Virtual Terminal](https://dashboard.stripe.com/) - integrates the Stripe Virtual Terminal for processing payments 
 
 ### Development Tools
 - [Air](ttps://github.com/air-verse/air) - live reload for Go apps
