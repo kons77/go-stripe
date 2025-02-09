@@ -1,7 +1,8 @@
 # Go Stripe
 
-This is the repository for the secure ecommerce application project doing on Trevor Sawler's course:
+This is the repository for a secure ecommerce application built while following Trevor Sawler's course:
 ["Building Web Applications with Go - Intermediate Level"](https://www.udemy.com/course/building-web-applications-with-go-intermediate-level/) 
+
 Learn how to build a secure ecommerce application with Go (go-stripe) 
 
 
@@ -18,5 +19,5 @@ Learn how to build a secure ecommerce application with Go (go-stripe)
 - [Stripe Virtual Terminal](https://dashboard.stripe.com/) - integrates the Stripe Virtual Terminal for processing payments 
 
 ### Development Tools
-- [Air](ttps://github.com/air-verse/air) - live reload for Go apps
+- [Air](https://github.com/air-verse/air) - live reload for Go apps
 - [Make](https://www.gnu.org/software/make) - controls the generation of executables and other non-source files 
