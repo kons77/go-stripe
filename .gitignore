@@ -4,3 +4,4 @@ database.yml
 **/coverage.out
 **/coverage
 **/main.exe
+dist/*
