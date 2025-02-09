@@ -70,6 +70,12 @@
     
     //  initialize with my publishable key
     stripe = Stripe("{{$stripePubKey}}")
+
+    // prevent user to click on the pay button twice 
+    function hidePayButton() {
+      payButton.classList.add("d-none")
+      porcessing.classList.remove("d-none")
+    }
     
     function val() {
       let form = document.getElementById("charge_form")
@@ -80,6 +86,7 @@
         return;
       }
       form.classList.add("was-validated")
+      hidePayButton();
     }
 
     (function () {

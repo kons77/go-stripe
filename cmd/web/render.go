@@ -25,7 +25,7 @@ type templateData struct {
 
 var functions = template.FuncMap{}
 
-// Embed the templates directory into the binary
+// Embed the templates directory into the binary - THERE SHOULD BE NO SPACE BETWEEN "//" and "go:embed templates"
 //
 //go:embed templates
 var templateFS embed.FS

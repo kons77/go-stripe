@@ -58,6 +58,7 @@ func main() {
 	flag.IntVar(&cfg.port, "port", 4000, "Server port to listen on")
 	flag.StringVar(&cfg.env, "env", "development", "Applicetion environment {development|production}")
 	flag.StringVar(&cfg.api, "api", "http://localhost:4001", "URL to api")
+	flag.StringVar(&cfg.db.dsn, "dsn", "", "Database DSN connection string")
 
 	flag.Parse()
 
