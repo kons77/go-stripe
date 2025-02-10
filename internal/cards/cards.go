@@ -1,8 +1,9 @@
-package card
+package cards
 
 import (
-	"github.com/stripe/stripe-go/v72"
-	"github.com/stripe/stripe-go/v72/paymentintent"
+	// "github.com/stripe/stripe-go/v72"
+	"github.com/stripe/stripe-go/v81"
+	"github.com/stripe/stripe-go/v81/paymentintent"
 )
 
 // card type holds necessary information to talk to Stripe

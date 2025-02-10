@@ -5,3 +5,4 @@ database.yml
 **/coverage
 **/main.exe
 dist/*
+dist
