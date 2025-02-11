@@ -61,7 +61,7 @@
 {{end}}
 
 {{define "js"}}
-  {{$stripePubKey := index .StringMap "stripePubKey"}}
+  {{$stripePubKey := index .StringMap "publishable_key"}}
 
   <script src="https://js.stripe.com/v3"></script>
 
@@ -127,7 +127,9 @@
         body: JSON.stringify(payload),
       }
 
-      fetch("http://127.0.0.1:4001/api/payment-intent", requestOptions)
+      // apiUrl = "http://127.0.0.1:4001/api/payment-intent"
+      let apiUrl = "{{.API}}/api/payment-intent"
+      fetch(apiUrl, requestOptions)
         .then(response => response.text()) 
         .then(response => {
           let data;
@@ -155,6 +157,7 @@
                   porcessing.classList.add("d-none");
                   showCardSuccess();
                   // would submit the form
+                  document.getElementById("charge_form").submit();
 
                 }
               }
