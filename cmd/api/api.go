@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/kons77/go-stripe/internal/driver"
 )
 
 const version = "1.0"
@@ -64,9 +65,16 @@ func main() {
 
 	cfg.stripe.secret = os.Getenv("STRIPE_SECRET")
 	cfg.stripe.key = os.Getenv("STRIPE_KEY")
+	cfg.db.dsn = os.Getenv("DSN")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	conn, err := driver.OpenDB(cfg.db.dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+	defer conn.Close()
 
 	app := &application{
 		config:   cfg,

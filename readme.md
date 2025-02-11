@@ -14,6 +14,7 @@ Learn how to build a secure ecommerce application with Go (go-stripe)
 - [Chi CORS](https://github.com/go-chi/cors) - CORS net/http middleware
 - [GoDotEnv](https://github.com/joho/godotenv) - loads environment variables from .env files
 - [Go Stripe](https://github.com/stripe/stripe-go) - Go library for the Stripe API
+- [MySQL Driver](https://github.com/go-sql-driver/mysql) - Go MySQL Driver
 
 ### UI Components
 - [Stripe Virtual Terminal](https://dashboard.stripe.com/) - integrates the Stripe Virtual Terminal for processing payments 

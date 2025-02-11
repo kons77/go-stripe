@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/kons77/go-stripe/internal/driver"
 )
 
 const version = "1.0"
@@ -48,6 +49,7 @@ func (app *application) serve() error {
 	}
 
 	app.infoLog.Printf("Starting HTTP server in %s mode on port %d", app.config.env, app.config.port)
+	//app.infoLog.Println(app.config.db.dsn)
 
 	return srv.ListenAndServe()
 }
@@ -69,11 +71,16 @@ func main() {
 
 	cfg.stripe.secret = os.Getenv("STRIPE_SECRET")
 	cfg.stripe.key = os.Getenv("STRIPE_KEY")
-
-	//log.Println("11", cfg.stripe.key, "22", cfg.stripe.secret)
+	cfg.db.dsn = os.Getenv("DSN")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	conn, err := driver.OpenDB(cfg.db.dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+	defer conn.Close()
 
 	tc := make(map[string]*template.Template)
 
