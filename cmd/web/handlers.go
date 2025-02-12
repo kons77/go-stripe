@@ -11,7 +11,7 @@ func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) 
 
 	if err := app.renderTemplate(w, r, "terminal", &templateData{
 		StringMap: stringMap,
-	}); err != nil {
+	}, "stripe-js"); err != nil {
 		app.errorLog.Println(err)
 	}
 }
@@ -48,7 +48,9 @@ func (app *application) PaymentSecceeded(w http.ResponseWriter, r *http.Request)
 
 // ChargeOnce displays the page to buy one widget
 func (app *application) ChargeOnce(w http.ResponseWriter, r *http.Request) {
-	if err := app.renderTemplate(w, r, "buy-once", nil); err != nil {
+	// ! pass publishable key to td instead of nil
+
+	if err := app.renderTemplate(w, r, "buy-once", nil, "stripe-js"); err != nil {
 		app.errorLog.Println(err)
 	}
 
