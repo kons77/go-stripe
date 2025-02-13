@@ -23,7 +23,14 @@ type templateData struct {
 	CSSVersion      string
 }
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"formatCurrency": formatCurrency,
+}
+
+func formatCurrency(n int) string {
+	f := float32(n / 100)
+	return fmt.Sprintf("$%.2f", f)
+}
 
 // Embed the templates directory into the binary - THERE SHOULD BE NO SPACE BETWEEN "//" and "go:embed templates"
 //
