@@ -11,6 +11,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/kons77/go-stripe/internal/driver"
+	"github.com/kons77/go-stripe/internal/models"
 )
 
 const version = "1.0"
@@ -36,6 +37,7 @@ type application struct {
 	errorLog      *log.Logger
 	templateCahce map[string]*template.Template // html/template package, not text/template
 	version       string
+	DB            models.DBModel
 }
 
 func (app *application) serve() error {
@@ -90,6 +92,7 @@ func main() {
 		errorLog:      errorLog,
 		templateCahce: tc,
 		version:       version,
+		DB:            models.DBModel{DB: conn},
 	}
 
 	err = app.serve()
