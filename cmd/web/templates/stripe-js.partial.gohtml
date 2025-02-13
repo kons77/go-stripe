@@ -1,7 +1,5 @@
 {{define "stripe-js"}}
 
-{{$stripePubKey := index .StringMap "publishable_key"}}
-
 <script src="https://js.stripe.com/v3"></script>
 
 <script>
@@ -12,7 +10,7 @@
   const porcessing = document.getElementById("processing-payment")
   
   //  initialize with my publishable key
-  stripe = Stripe("{{$stripePubKey}}")
+  stripe = Stripe("{{.StripePublishableKey}}")
 
   // prevent user to click on the pay button twice 
   function hidePayButton() {
