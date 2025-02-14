@@ -1,3 +1,4 @@
 # Exclude directories from GitHub language stats
 examples/* linguist-vendored
 examples/ linguist-vendored
+database.yml
