@@ -2,8 +2,10 @@ package cards
 
 import (
 	// "github.com/stripe/stripe-go/v72"
+
 	"github.com/stripe/stripe-go/v81"
 	"github.com/stripe/stripe-go/v81/paymentintent"
+	"github.com/stripe/stripe-go/v81/paymentmethod"
 )
 
 // card type holds necessary information to talk to Stripe
@@ -48,6 +50,60 @@ func (c *Card) CreatePaymentIntent(currency string, amount int) (*stripe.Payment
 	}
 	return pi, "", nil
 }
+
+// GetPaymentMethod gets the payment method by payment intend id
+func (c *Card) GetPaymentMethod(s string) (*stripe.PaymentMethod, error) {
+	stripe.Key = c.Secret
+
+	pm, err := paymentmethod.Get(s, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return pm, nil
+}
+
+// RetrievePaymentIntent gets an existing payment intent by id
+func (c *Card) RetrievePaymentIntent(id string) (*stripe.PaymentIntent, error) {
+	stripe.Key = c.Secret
+
+	pi, err := paymentintent.Get(id, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return pi, nil
+}
+
+/*  JUST USE pi.LatestCharge.ID
+// RetrieveCharge an existing charge by paiment intent id
+func (c *Card) RetrieveCharge(id string) (*stripe.Charge, error) {
+	Stripe has deprecated direct access to Charges in PaymentIntents as part of their newer API versions.
+	Instead, you should use payment_intent.
+	LatestCharge to get the associated charge ID and then retrieve the charge separately if needed.
+	stripe.Key = c.Secret
+
+	pi, err := paymentintent.Get(id, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Retrieve the charge using LatestCharge
+	if pi.LatestCharge == nil {
+		return nil, fmt.Errorf("no charge found for this payment intent")
+	}
+
+	// Retrieve the charge details
+	chargeID := pi.LatestCharge.ID
+
+	ch, err := charge.Get(chargeID, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return ch, nil
+}
+*/
 
 func cardErrorMessage(code stripe.ErrorCode) string {
 	var msg = ""

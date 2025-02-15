@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/kons77/go-stripe/internal/cards"
 )
 
 func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) {
@@ -29,6 +30,28 @@ func (app *application) PaymentSecceeded(w http.ResponseWriter, r *http.Request)
 	paymentAmount, _ := strconv.Atoi(r.Form.Get("payment_amount"))
 	paymentCurrency := r.Form.Get("payment_currency")
 
+	card := cards.Card{
+		Secret: app.config.stripe.secret,
+		Key:    app.config.stripe.key,
+	}
+
+	pi, err := card.RetrievePaymentIntent(paymentIntent)
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	pm, err := card.GetPaymentMethod(paymentMethod)
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	lastFour := pm.Card.Last4
+	expiryMonth := pm.Card.ExpMonth
+	expiryYear := pm.Card.ExpYear
+
+	// data passing to a receipt page
 	data := make(map[string]interface{})
 	data["cardholder"] = cardHolder
 	data["email"] = email
@@ -36,8 +59,12 @@ func (app *application) PaymentSecceeded(w http.ResponseWriter, r *http.Request)
 	data["pm"] = paymentMethod
 	data["pa"] = paymentAmount
 	data["pc"] = paymentCurrency
+	data["last_four"] = lastFour
+	data["expiry_month"] = expiryMonth
+	data["expiry_year"] = expiryYear
+	data["bank_return_code"] = pi.LatestCharge.ID
 
-	if err := app.renderTemplate(w, r, "secceeded", &templateData{
+	if err := app.renderTemplate(w, r, "succeeded", &templateData{
 		Data: data,
 	}); err != nil {
 		app.errorLog.Println(err)
