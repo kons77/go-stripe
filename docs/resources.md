@@ -5,3 +5,7 @@ https://docs.stripe.com/testing
 
 Stripe Test Dashboard:
 https://dashboard.stripe.com/test/dashboard 
+
+Stripe Transactions
+
+https://dashboard.stripe.com/test/payments

@@ -11,7 +11,7 @@
     <p>Cardholder Name: {{index .Data "cardholder"}}</p>
     <p>Email: {{index .Data "email"}}</p>
     <p>Payment Method: {{index .Data "pm"}}</p>
-    <p>Payment Amount: {{index .Data "pa"}}</p>
+    <p>Payment Amount: {{formatCurrency (index .Data "pa")}}</p>
     <p>Currency: {{index .Data "pc"}}</p>
 
 {{end}}

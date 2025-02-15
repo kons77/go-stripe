@@ -2,8 +2,9 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
-	"github.com/kons77/go-stripe/internal/models"
+	"github.com/go-chi/chi/v5"
 )
 
 func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +26,7 @@ func (app *application) PaymentSecceeded(w http.ResponseWriter, r *http.Request)
 	email := r.Form.Get("cardholder_email")
 	paymentIntent := r.Form.Get("payment_intent")
 	paymentMethod := r.Form.Get("payment_method")
-	paymentAmount := r.Form.Get("payment_amount")
+	paymentAmount, _ := strconv.Atoi(r.Form.Get("payment_amount"))
 	paymentCurrency := r.Form.Get("payment_currency")
 
 	data := make(map[string]interface{})
@@ -45,13 +46,13 @@ func (app *application) PaymentSecceeded(w http.ResponseWriter, r *http.Request)
 
 // ChargeOnce displays the page to buy one widget
 func (app *application) ChargeOnce(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	widgetID, _ := strconv.Atoi(id)
 
-	widget := models.Widget{
-		ID:             1,
-		Name:           "Custom Widget",
-		Description:    "A very nice widget",
-		InventoryLevel: 10,
-		Price:          1000,
+	widget, err := app.DB.GetWidget(widgetID)
+	if err != nil {
+		app.errorLog.Println(err) //we'll fix that later on and we'll write this out as Json.
+		return
 	}
 
 	data := make(map[string]interface{})

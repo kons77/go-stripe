@@ -94,13 +94,87 @@ func (m *DBModel) GetWidget(id int) (Widget, error) {
 
 	// Both MySql and MariaDB required ?
 	q := `
-		select id, name from widgets where id = ?
+		select id, name, description, inventory_level, price, created_at, updated_at, coalesce(image, '')
+		from widgets where id = ?
 	`
 	row := m.DB.QueryRowContext(ctx, q, id)
-	err := row.Scan(&widget.ID, &widget.Name)
+	err := row.Scan(
+		&widget.ID,
+		&widget.Name,
+		&widget.Description,
+		&widget.InventoryLevel,
+		&widget.Price,
+		&widget.CreatedAt,
+		&widget.UpdatedAt,
+		&widget.Image,
+	)
 	if err != nil {
 		return widget, err
 	}
 
 	return widget, nil
+}
+
+// InsertTransaction inserts a new transaction, and returns its id
+func (m *DBModel) InsertTransaction(txn Trasaction) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `
+		INSERT INTO transactions
+			(amount, currency, last_four, bank_return_code, transaction_status_id, created_at, updated_at)
+		VALUES(?, ?, ?, ?, ?, ?, ?)
+	`
+
+	result, err := m.DB.ExecContext(ctx, stmt,
+		txn.Amount,
+		txn.Currency,
+		txn.LastFour,
+		txn.BankReturnCode,
+		txn.TrasactionStatusID,
+		time.Now(),
+		time.Now(),
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
+}
+
+// InsertOrder inserts a new order, and returns its id
+func (m *DBModel) InsertOrder(order Order) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `
+		INSERT INTO orders
+			(widget_id, transaction_id, status_id, quantity, amount, created_at, updated_at)
+		VALUES(?, ?, ?, ?, ?, ?, ?)
+	`
+
+	result, err := m.DB.ExecContext(ctx, stmt,
+		order.WidgetID,
+		order.TrasactionID,
+		order.StatusID,
+		order.Quantity,
+		order.Amount,
+		time.Now(),
+		time.Now(),
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
 }
