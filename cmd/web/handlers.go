@@ -72,7 +72,7 @@ func (app *application) PaymentSecceeded(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	app.infoLog.Println(customerID)
+	//app.infoLog.Println(customerID)
 
 	// create a new transaction
 	amount, _ := strconv.Atoi(paymentAmount)
@@ -82,6 +82,8 @@ func (app *application) PaymentSecceeded(w http.ResponseWriter, r *http.Request)
 		LastFour:           lastFour,
 		ExpiryMonth:        int(expiryMonth),
 		ExpiryYear:         int(expiryYear),
+		PaymentIntent:      paymentIntent,
+		PaymentMethod:      paymentMethod,
 		BankReturnCode:     pi.LatestCharge.ID,
 		TrasactionStatusID: 2, //cleared
 	}
