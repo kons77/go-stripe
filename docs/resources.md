@@ -7,5 +7,7 @@ Stripe Test Dashboard:
 https://dashboard.stripe.com/test/dashboard 
 
 Stripe Transactions
-
 https://dashboard.stripe.com/test/payments
+
+What are floating point errors?
+https://blog.penjee.com/what-are-floating-point-errors-answered/

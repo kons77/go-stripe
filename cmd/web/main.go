@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/alexedwards/scs/v2"
 	"github.com/joho/godotenv"
 	"github.com/kons77/go-stripe/internal/driver"
 	"github.com/kons77/go-stripe/internal/models"
@@ -16,6 +17,8 @@ import (
 
 const version = "1.0"
 const cssVersion = "1"
+
+var session *scs.SessionManager
 
 type config struct {
 	port int
@@ -38,6 +41,7 @@ type application struct {
 	templateCahce map[string]*template.Template // html/template package, not text/template
 	version       string
 	DB            models.DBModel
+	Session       *scs.SessionManager
 }
 
 func (app *application) serve() error {
@@ -78,11 +82,16 @@ func main() {
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
+	// make database connection
 	conn, err := driver.OpenDB(cfg.db.dsn)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 	defer conn.Close()
+
+	// set up session
+	session = scs.New()
+	session.Lifetime = 24 * time.Hour
 
 	tc := make(map[string]*template.Template)
 
@@ -93,6 +102,7 @@ func main() {
 		templateCahce: tc,
 		version:       version,
 		DB:            models.DBModel{DB: conn},
+		Session:       session,
 	}
 
 	err = app.serve()
