@@ -99,6 +99,7 @@ func (app *application) GetTransactionData(r *http.Request) (TrasactionData, err
 	return txnData, nil
 }
 
+// PaymentSecceeded displays the receipt page for transactions
 func (app *application) PaymentSecceeded(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -106,6 +107,7 @@ func (app *application) PaymentSecceeded(w http.ResponseWriter, r *http.Request)
 		return //isn't very polite, but it's sufficient for our purposes
 	}
 
+	// read posted data
 	productID := r.Form.Get("product_id")
 	widgetID, _ := strconv.Atoi(productID)
 
@@ -164,6 +166,39 @@ func (app *application) PaymentSecceeded(w http.ResponseWriter, r *http.Request)
 	http.Redirect(w, r, "/receipt", http.StatusSeeOther)
 }
 
+// VirtualTerminalPaymentSecceeded displays the receipt page for virtual terminal transactions
+func (app *application) VirtualTerminalPaymentSecceeded(w http.ResponseWriter, r *http.Request) {
+	txnData, err := app.GetTransactionData(r)
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	// create a new transaction
+	txn := models.Trasaction{
+		Amount:             txnData.PaymentAmount,
+		Currency:           txnData.PaymentCurrency,
+		LastFour:           txnData.LastFour,
+		ExpiryMonth:        txnData.ExpiryMonth,
+		ExpiryYear:         txnData.ExpiryYear,
+		PaymentIntent:      txnData.PaymentIntentID,
+		PaymentMethod:      txnData.PaymentMethodID,
+		BankReturnCode:     txnData.BankReturnCode,
+		TrasactionStatusID: 2, //cleared
+	}
+
+	_, err = app.SaveTransaction(txn)
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	// write this data to session, and then refirect user to new page
+	app.Session.Put(r.Context(), "receipt", txnData)
+	http.Redirect(w, r, "/virtual-terminal-receipt", http.StatusSeeOther)
+}
+
+// Receipt
 func (app *application) Receipt(w http.ResponseWriter, r *http.Request) {
 	txn := app.Session.Get(r.Context(), "receipt").(TrasactionData)
 	data := make(map[string]interface{})
@@ -171,6 +206,20 @@ func (app *application) Receipt(w http.ResponseWriter, r *http.Request) {
 	app.Session.Remove(r.Context(), "receipt")
 
 	if err := app.renderTemplate(w, r, "receipt", &templateData{
+		Data: data,
+	}); err != nil {
+		app.errorLog.Println(err)
+	}
+}
+
+// VirtualTerminalReceipt
+func (app *application) VirtualTerminalReceipt(w http.ResponseWriter, r *http.Request) {
+	txn := app.Session.Get(r.Context(), "receipt").(TrasactionData)
+	data := make(map[string]interface{})
+	data["txn"] = txn
+	app.Session.Remove(r.Context(), "receipt")
+
+	if err := app.renderTemplate(w, r, "virtual-terminal-receipt", &templateData{
 		Data: data,
 	}); err != nil {
 		app.errorLog.Println(err)
