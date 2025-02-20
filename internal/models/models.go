@@ -31,6 +31,8 @@ type Widget struct {
 	InventoryLevel int       `json:"inventory_level"`
 	Price          int       `json:"price"`
 	Image          string    `json:"image"`
+	IsReccuring    bool      `json:"is_reccuring"`
+	PlanID         string    `json:"plan_id"`
 	CreatedAt      time.Time `json:"-"`
 	UpdatedAt      time.Time `json:"-"`
 }
@@ -109,7 +111,8 @@ func (m *DBModel) GetWidget(id int) (Widget, error) {
 
 	// Both MySql and MariaDB required ?
 	q := `
-		select id, name, description, inventory_level, price, created_at, updated_at, coalesce(image, '')
+		select id, name, description, inventory_level, price, is_recurring, 
+			plan_id, created_at, updated_at, coalesce(image, '')
 		from widgets where id = ?
 	`
 	row := m.DB.QueryRowContext(ctx, q, id)
@@ -119,6 +122,8 @@ func (m *DBModel) GetWidget(id int) (Widget, error) {
 		&widget.Description,
 		&widget.InventoryLevel,
 		&widget.Price,
+		&widget.IsReccuring,
+		&widget.PlanID,
 		&widget.CreatedAt,
 		&widget.UpdatedAt,
 		&widget.Image,
