@@ -11,7 +11,7 @@ import (
 // TemplateData holds data that will be passed to templates
 type templateData struct {
 	StringMap            map[string]string
-	IntMap               map[string]string
+	IntMap               map[string]int
 	FloatMap             map[string]float32
 	Data                 map[string]interface{}
 	CSRFToket            string
