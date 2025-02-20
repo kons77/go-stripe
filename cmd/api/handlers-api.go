@@ -10,8 +10,12 @@ import (
 )
 
 type stripePayload struct {
-	Currency string `json:"currency"`
-	Amount   string `json:"amount"`
+	Currency      string `json:"currency"`
+	Amount        string `json:"amount"`
+	PaymentMethod string `json:"payment_method"`
+	Email         string `json:"email"`
+	LastFour      string `json:"last_four"`
+	Plan          string `json:"plan"`
 }
 
 type jsonResponce struct {
@@ -87,6 +91,34 @@ func (app *application) GetWidgetByID(w http.ResponseWriter, r *http.Request) {
 	out, err := json.MarshalIndent(widget, "", "  ") // you shouldn't use Indent in production but for development it's fine.
 	if err != nil {
 		app.errorLog.Println(err) //we'll fix that later on and we'll write this out as Json.
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(out)
+}
+
+func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, r *http.Request) {
+	var data stripePayload
+	err := json.NewDecoder(r.Body).Decode(&data)
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	app.infoLog.Println(data.Email, data.LastFour, data.PaymentMethod, data.Plan)
+
+	okay := true
+	msg := ""
+
+	resp := jsonResponce{
+		OK:      okay,
+		Message: msg,
+	}
+
+	out, err := json.MarshalIndent(resp, "", "   ")
+	if err != nil {
+		app.errorLog.Println(err)
 		return
 	}
 

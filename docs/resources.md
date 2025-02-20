@@ -1,5 +1,13 @@
 # Links and resources
 
+## Reading 
+
+What are floating point errors?
+https://blog.penjee.com/what-are-floating-point-errors-answered/
+
+
+## Stripe links 
+
 Stripe Test Cards 
 https://docs.stripe.com/testing 
 
@@ -9,5 +17,5 @@ https://dashboard.stripe.com/test/dashboard
 Stripe Transactions
 https://dashboard.stripe.com/test/payments
 
-What are floating point errors?
-https://blog.penjee.com/what-are-floating-point-errors-answered/
+The Stripe Customer object 
+https://docs.stripe.com/api/customers/object

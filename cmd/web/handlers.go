@@ -287,8 +287,9 @@ func (app *application) ChargeOnce(w http.ResponseWriter, r *http.Request) {
 	}, "stripe-js"); err != nil {
 		app.errorLog.Println(err)
 	}
-
 }
+
+// Bronz
 func (app *application) BronzePlan(w http.ResponseWriter, r *http.Request) {
 	widget, err := app.DB.GetWidget(2)
 	if err != nil {
