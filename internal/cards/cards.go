@@ -4,8 +4,10 @@ import (
 	// "github.com/stripe/stripe-go/v72"
 
 	"github.com/stripe/stripe-go/v81"
+	"github.com/stripe/stripe-go/v81/customer"
 	"github.com/stripe/stripe-go/v81/paymentintent"
 	"github.com/stripe/stripe-go/v81/paymentmethod"
+	"github.com/stripe/stripe-go/v81/subscription"
 )
 
 // card type holds necessary information to talk to Stripe
@@ -75,35 +77,49 @@ func (c *Card) RetrievePaymentIntent(id string) (*stripe.PaymentIntent, error) {
 	return pi, nil
 }
 
-/*  JUST USE pi.LatestCharge.ID
-// RetrieveCharge an existing charge by paiment intent id
-func (c *Card) RetrieveCharge(id string) (*stripe.Charge, error) {
-	Stripe has deprecated direct access to Charges in PaymentIntents as part of their newer API versions.
-	Instead, you should use payment_intent.
-	LatestCharge to get the associated charge ID and then retrieve the charge separately if needed.
-	stripe.Key = c.Secret
+// SubscribeToPlan use a newly created customer to subscribe to a given plan
+func (c *Card) SubscribeToPlan(cust *stripe.Customer, plan, email, last4, cardType string) (string, error) {
+	stripeCustomerID := cust.ID
+	items := []*stripe.SubscriptionItemsParams{
+		{Plan: stripe.String(plan)},
+	}
 
-	pi, err := paymentintent.Get(id, nil)
+	params := &stripe.SubscriptionParams{
+		Customer: stripe.String(stripeCustomerID),
+		Items:    items,
+	}
+
+	params.AddMetadata("last_four", last4)
+	params.AddMetadata("card_type", cardType)
+	params.AddExpand("latest_invoice.payment_intent")
+	subscr, err := subscription.New(params)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-
-	// Retrieve the charge using LatestCharge
-	if pi.LatestCharge == nil {
-		return nil, fmt.Errorf("no charge found for this payment intent")
-	}
-
-	// Retrieve the charge details
-	chargeID := pi.LatestCharge.ID
-
-	ch, err := charge.Get(chargeID, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return ch, nil
+	return subscr.ID, nil
 }
-*/
+
+// CreateCustomer creates a new customer on stripe
+func (c *Card) CreateCustomer(pm, email string) (*stripe.Customer, string, error) {
+	stripe.Key = c.Secret
+	customerParams := &stripe.CustomerParams{
+		PaymentMethod: stripe.String(pm),
+		Email:         stripe.String(email),
+		InvoiceSettings: &stripe.CustomerInvoiceSettingsParams{
+			DefaultPaymentMethod: stripe.String(pm),
+		},
+	}
+
+	cust, err := customer.New(customerParams)
+	if err != nil {
+		msg := ""
+		if stripeErr, ok := err.(*stripe.Error); ok {
+			msg = cardErrorMessage(stripeErr.Code)
+		}
+		return nil, msg, err
+	}
+	return cust, "", nil
+}
 
 func cardErrorMessage(code stripe.ErrorCode) string {
 	var msg = ""
