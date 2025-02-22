@@ -8,6 +8,9 @@ https://blog.penjee.com/what-are-floating-point-errors-answered/
 
 ## Stripe links 
 
+Stripe API Keys
+https://dashboard.stripe.com/test/apikeys
+
 Stripe Test Cards 
 https://docs.stripe.com/testing 
 
@@ -19,3 +22,4 @@ https://dashboard.stripe.com/test/payments
 
 The Stripe Customer object 
 https://docs.stripe.com/api/customers/object
+

@@ -78,7 +78,7 @@ func (c *Card) RetrievePaymentIntent(id string) (*stripe.PaymentIntent, error) {
 }
 
 // SubscribeToPlan use a newly created customer to subscribe to a given plan
-func (c *Card) SubscribeToPlan(cust *stripe.Customer, plan, email, last4, cardType string) (string, error) {
+func (c *Card) SubscribeToPlan(cust *stripe.Customer, plan, email, last4, cardType string) (*stripe.Subscription, error) {
 	stripeCustomerID := cust.ID
 	items := []*stripe.SubscriptionItemsParams{
 		{Plan: stripe.String(plan)},
@@ -94,9 +94,9 @@ func (c *Card) SubscribeToPlan(cust *stripe.Customer, plan, email, last4, cardTy
 	params.AddExpand("latest_invoice.payment_intent")
 	subscr, err := subscription.New(params)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return subscr.ID, nil
+	return subscr, nil
 }
 
 // CreateCustomer creates a new customer on stripe

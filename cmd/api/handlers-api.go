@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/kons77/go-stripe/internal/cards"
+	"github.com/kons77/go-stripe/internal/models"
+	"github.com/stripe/stripe-go/v81"
 )
 
 type stripePayload struct {
@@ -14,8 +17,14 @@ type stripePayload struct {
 	Amount        string `json:"amount"`
 	PaymentMethod string `json:"payment_method"`
 	Email         string `json:"email"`
+	CardBrand     string `json:"card_brand"`
+	ExpiryMonth   int    `json:"exp_month"`
+	ExpiryYear    int    `json:"exp_year"`
 	LastFour      string `json:"last_four"`
 	Plan          string `json:"plan"`
+	ProductID     string `json:"product_id"`
+	FirstName     string `json:"first_name"`
+	LastName      string `json:"last_name"`
 }
 
 type jsonResponce struct {
@@ -106,14 +115,86 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 		return
 	}
 
-	app.infoLog.Println(data.Email, data.LastFour, data.PaymentMethod, data.Plan)
+	app.infoLog.Println(data.Email, data.LastFour, data.PaymentMethod, data.Plan, '\n', "------")
+
+	card := cards.Card{
+		Secret:   app.config.stripe.secret,
+		Key:      app.config.stripe.key,
+		Currency: data.Currency,
+	}
 
 	okay := true
-	msg := ""
+	var subscription *stripe.Subscription
+	txnMsg := "Transcation successful"
+
+	stripeCustomer, msg, err := card.CreateCustomer(data.PaymentMethod, data.Email)
+	if err != nil {
+		app.errorLog.Println(err)
+		okay = false
+		txnMsg = msg
+	}
+
+	if okay {
+		subscription, err = card.SubscribeToPlan(stripeCustomer, data.Plan, data.Email, data.LastFour, "")
+		if err != nil {
+			app.errorLog.Println(err)
+			okay = false
+			txnMsg = "Error subscribing customer"
+		}
+
+		app.infoLog.Println("subscription id is", subscription.ID)
+	}
+
+	if okay {
+		// create a new customer - later need to check if customer exists then login
+		productID, _ := strconv.Atoi(data.ProductID)
+		customerID, err := app.SaveCustomer(data.FirstName, data.LastName, data.Email)
+		if err != nil {
+			app.errorLog.Println(err)
+			return
+		}
+
+		// create a new transaction
+		amount, _ := strconv.Atoi(data.Amount)
+		// expiryMonth := data.ExpiryMonth
+		// expiryYear := data.ExpiryYear
+		txn := models.Trasaction{
+			Amount:             amount,
+			Currency:           "usd",
+			LastFour:           data.LastFour,
+			ExpiryMonth:        data.ExpiryMonth,
+			ExpiryYear:         data.ExpiryYear,
+			TrasactionStatusID: 2,
+		}
+
+		txnID, err := app.SaveTransaction(txn)
+		if err != nil {
+			app.errorLog.Println(err)
+			return
+		}
+
+		// create order
+		order := models.Order{
+			WidgetID:     productID,
+			TrasactionID: txnID,
+			CustomerID:   customerID,
+			StatusID:     1,
+			Quantity:     1,
+			Amount:       amount,
+			CreatedAt:    time.Now(),
+			UpdatedAt:    time.Now(),
+		}
+
+		_, err = app.SaveOrder(order)
+		if err != nil {
+			app.errorLog.Println(err)
+			return
+		}
+	}
 
 	resp := jsonResponce{
 		OK:      okay,
-		Message: msg,
+		Message: txnMsg,
 	}
 
 	out, err := json.MarshalIndent(resp, "", "   ")
@@ -124,4 +205,40 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(out)
+}
+
+// SaveCustomer saves a customer and returns id - may be  different for frontend and for backend
+func (app *application) SaveCustomer(firstName, lastName, email string) (int, error) {
+	customer := models.Customer{
+		FirstName: firstName,
+		LastName:  lastName,
+		Email:     email,
+	}
+
+	id, err := app.DB.InsertCustomer(customer)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+// SaveTransaction saves a transaction and returns id
+func (app *application) SaveTransaction(txn models.Trasaction) (int, error) {
+	id, err := app.DB.InsertTransaction(txn)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+// SaveOrder saves a order and returns id
+func (app *application) SaveOrder(order models.Order) (int, error) {
+	id, err := app.DB.InsertOrder(order)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
