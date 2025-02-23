@@ -57,7 +57,7 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, data in
 }
 
 // badRequest sends a JSON response with status http.StatusBadRequest, describing the error
-func (app *application) badRequest(w http.ResponseWriter, err error) error {
+func (app *application) badRequest(w http.ResponseWriter, r *http.Request, err error) error {
 	var payload struct {
 		Error   bool   `json:"error"`
 		Message string `json:"message"`
