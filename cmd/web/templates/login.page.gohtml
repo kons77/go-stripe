@@ -23,8 +23,16 @@
 
     <div class="mb-3">
       <label for="password" class="form-label">Password</label>
-      <input type="password" class="form-control" id="password" name="password"
-      required="" autocomplete="password-new">
+      
+      <div class="input-group">
+        <input type="password" class="form-control" id="password" name="password"
+        required="" autocomplete="password-new">
+        <div class="input-group-append">
+          <button type="button" class="btn btn-outline-secondary" id="toggle_password">
+              <i class="bi bi-eye"></i>
+          </button>
+        </div>
+      </div>
     </div>
 
     <hr>
@@ -71,5 +79,36 @@
         console.log(response);
       })
   }
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const passwordInput = document.getElementById("password");
+    const toggleButton = document.getElementById("toggle_password");
+    const icon = toggleButton.querySelector("i");
+    // Get the form element
+    const form = document.getElementById("password_form");
+    const hashedPasswordInput = document.getElementById("hashed_password");
+    const copyButton = document.getElementById("copy_button");
+
+
+    // view password functionality
+    toggleButton.addEventListener("mousedown", function () {
+        passwordInput.type = "text";
+        icon.classList.remove("bi-eye");
+        icon.classList.add("bi-eye-slash");
+    });
+
+    toggleButton.addEventListener("mouseup", function () {
+        passwordInput.type = "password";
+        icon.classList.remove("bi-eye-slash");
+        icon.classList.add("bi-eye");
+    });
+
+    toggleButton.addEventListener("mouseleave", function () {
+        passwordInput.type = "password";
+        icon.classList.remove("bi-eye-slash");
+        icon.classList.add("bi-eye");
+    });
+  });
 </script>
 {{end}}
