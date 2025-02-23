@@ -5,6 +5,8 @@ import (
 	"errors"
 	"io"
 	"net/http"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // writeJSON  write aribtrary data out as JSON
@@ -55,14 +57,14 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, data in
 }
 
 // badRequest sends a JSON response with status http.StatusBadRequest, describing the error
-func (app *application) badRequest(w http.ResponseWriter, r *http.Request, err error) error {
+func (app *application) badRequest(w http.ResponseWriter, err error) error {
 	var payload struct {
 		Error   bool   `json:"error"`
 		Message string `json:"message"`
 	}
 
 	payload.Error = true
-	payload.Message = "bad request"
+	payload.Message = err.Error()
 
 	err = app.writeJSON(w, http.StatusBadRequest, payload)
 	if err != nil {
@@ -95,4 +97,17 @@ func (app *application) invalidCredentials(w http.ResponseWriter) error {
 		return err
 	}
 	return nil
+}
+
+func (app *application) passwordMatches(hash, password string) (bool, error) {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err != nil {
+		switch {
+		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
+			return false, nil
+		default:
+			return false, err
+		}
+	}
+	return true, nil
 }
