@@ -80,16 +80,10 @@
       })
   }
 
-
   document.addEventListener("DOMContentLoaded", function () {
     const passwordInput = document.getElementById("password");
     const toggleButton = document.getElementById("toggle_password");
     const icon = toggleButton.querySelector("i");
-    // Get the form element
-    const form = document.getElementById("password_form");
-    const hashedPasswordInput = document.getElementById("hashed_password");
-    const copyButton = document.getElementById("copy_button");
-
 
     // view password functionality
     toggleButton.addEventListener("mousedown", function () {
