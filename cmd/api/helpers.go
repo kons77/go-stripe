@@ -62,14 +62,37 @@ func (app *application) badRequest(w http.ResponseWriter, r *http.Request, err e
 	}
 
 	payload.Error = true
-	payload.Message = err.Error()
+	payload.Message = "bad request"
 
-	out, err := json.MarshalIndent(payload, "", "\t")
+	err = app.writeJSON(w, http.StatusBadRequest, payload)
 	if err != nil {
 		return err
 	}
+	return nil
+	/*
+		out, err := json.MarshalIndent(payload, "", "\t")
+		if err != nil {
+			return err
+		}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(out)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(out)
+		return nil
+	*/
+}
+
+func (app *application) invalidCredentials(w http.ResponseWriter) error {
+	var payload struct {
+		Error   bool   `json:"error"`
+		Message string `json:"message"`
+	}
+
+	payload.Error = true
+	payload.Message = "invalid authentication credentials"
+
+	err := app.writeJSON(w, http.StatusUnauthorized, payload)
+	if err != nil {
+		return err
+	}
 	return nil
 }
