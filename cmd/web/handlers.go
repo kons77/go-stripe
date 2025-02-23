@@ -289,7 +289,7 @@ func (app *application) ChargeOnce(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Bronz
+// BronzePlan displays the page to subcribe
 func (app *application) BronzePlan(w http.ResponseWriter, r *http.Request) {
 	widget, err := app.DB.GetWidget(2)
 	if err != nil {
@@ -307,9 +307,16 @@ func (app *application) BronzePlan(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Bronz
+// BronzePlanReceipt displays the receipt for bronze plans
 func (app *application) BronzePlanReceipt(w http.ResponseWriter, r *http.Request) {
 	if err := app.renderTemplate(w, r, "receipt-plan", &templateData{}); err != nil {
+		app.errorLog.Println(err)
+	}
+}
+
+// LoginPage displays the login page
+func (app *application) LoginPage(w http.ResponseWriter, r *http.Request) {
+	if err := app.renderTemplate(w, r, "login", &templateData{}); err != nil {
 		app.errorLog.Println(err)
 	}
 }
