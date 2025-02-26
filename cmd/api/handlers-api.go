@@ -246,6 +246,7 @@ func (app *application) SaveOrder(order models.Order) (int, error) {
 	return id, nil
 }
 
+// CreateAuthToken
 func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) {
 	var userInput struct {
 		Email    string `json:"email"`
@@ -292,7 +293,6 @@ func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// send response
-
 	var payload struct {
 		Error   bool          `json:"error"`
 		Message string        `json:"message"`
@@ -324,7 +324,7 @@ func (app *application) authenticateToken(r *http.Request) (*models.User, error)
 	}
 
 	// get the user from the tokens table
-	user, err := app.DB.GetUserByForToken(token)
+	user, err := app.DB.GetUserForToken(token)
 	if err != nil {
 		return nil, errors.New("no matchin user found")
 	}
