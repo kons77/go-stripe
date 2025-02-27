@@ -32,10 +32,6 @@ func (app *application) routes() http.Handler {
 		// use middleware
 		mux.Use(app.Auth)
 
-		mux.Get("/test", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("got in"))
-		})
-
 		mux.Post("/virtual-terminal-succeeded", app.VirtualTerminalPaymentSucceeded)
 
 	})
