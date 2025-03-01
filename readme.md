@@ -13,6 +13,7 @@ Learn how to build a secure ecommerce application with Go (go-stripe)
 - [Chi Router](https://github.com/go-chi/chi/v5) - routing and middleware
 - [Chi CORS](https://github.com/go-chi/cors) - CORS net/http middleware
 - [Alex Edwards SCS](https://github.com/alexedwards/scs/v2) - session management 
+- [Alex Edwards mysqlstore](https://github.com/alexedwards/scs/mysqlstore) - to store session in the db
 - [GoDotEnv](https://github.com/joho/godotenv) - loads environment variables from .env files
 - [Go Stripe](https://github.com/stripe/stripe-go) - Go library for the Stripe API
 - [MySQL Driver](https://github.com/go-sql-driver/mysql) - Go MySQL Driver

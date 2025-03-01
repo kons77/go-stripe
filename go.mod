@@ -12,4 +12,7 @@ require (
 	golang.org/x/crypto v0.34.0
 )
 
-require filippo.io/edwards25519 v1.1.0 // indirect
+require (
+	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/alexedwards/scs/mysqlstore v0.0.0-20250212122300-421ef1d8611c // indirect
+)
