@@ -65,7 +65,7 @@ func main() {
 	flag.StringVar(&cfg.env, "env", "development", "Applicetion environment {development|production|maintenance}")
 	flag.StringVar(&cfg.db.dsn, "dsn", "", "Database DSN connection string")
 	flag.StringVar(&cfg.smtp.host, "smtphost", "", "smtp host")
-	flag.IntVar(&cfg.smtp.port, "port", 587, "SMTP port")
+	flag.IntVar(&cfg.smtp.port, "smtpport", 587, "SMTP port")
 	flag.StringVar(&cfg.smtp.username, "smtpuser", "", "smtp username")
 	flag.StringVar(&cfg.smtp.password, "smtppassword", "", "smtp password")
 	//maybe AUTH and TLS
