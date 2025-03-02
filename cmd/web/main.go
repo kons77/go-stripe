@@ -87,7 +87,7 @@ func main() {
 	cfg.stripe.secret = os.Getenv("STRIPE_SECRET")
 	cfg.stripe.key = os.Getenv("STRIPE_KEY")
 	cfg.db.dsn = os.Getenv("DSN")
-	cfg.secretkey = os.Getenv("SIGN_KEY")
+	cfg.secretkey = os.Getenv("SIGN_KEY") // must be exactly 32 characters long
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
