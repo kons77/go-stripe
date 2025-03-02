@@ -34,6 +34,8 @@ type config struct {
 		secret string
 		key    string
 	}
+	secretkey string // secret key to sign reset password link
+	frontend  string // url to frontend
 }
 
 // Application struct (holds app configuration)
@@ -72,6 +74,8 @@ func main() {
 	flag.StringVar(&cfg.env, "env", "development", "Applicetion environment {development|production}")
 	flag.StringVar(&cfg.api, "api", "http://127.0.0.1:4001", "URL to api")
 	flag.StringVar(&cfg.db.dsn, "dsn", "", "Database DSN connection string")
+	//flag.StringVar(&cfg.secretkey, "secret", "", "secret key")
+	flag.StringVar(&cfg.frontend, "frontend", "http://127.0.0.1:4000", "url to frontend")
 
 	flag.Parse()
 
@@ -83,6 +87,7 @@ func main() {
 	cfg.stripe.secret = os.Getenv("STRIPE_SECRET")
 	cfg.stripe.key = os.Getenv("STRIPE_KEY")
 	cfg.db.dsn = os.Getenv("DSN")
+	cfg.secretkey = os.Getenv("SIGN_KEY")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)

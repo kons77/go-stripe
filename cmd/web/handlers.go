@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/kons77/go-stripe/internal/cards"
 	"github.com/kons77/go-stripe/internal/models"
+	"github.com/kons77/go-stripe/internal/urlsigner"
 )
 
 // Home terminal displays home page
@@ -353,6 +355,26 @@ func (app *application) LogOut(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	if err := app.renderTemplate(w, r, "forgot-password", &templateData{}); err != nil {
+		app.errorLog.Println(err)
+	}
+}
+
+func (app *application) ShowResetPassword(w http.ResponseWriter, r *http.Request) {
+	theURL := r.RequestURI
+	testURL := fmt.Sprintf("%s%s", app.config.frontend, theURL)
+
+	signer := urlsigner.Signer{
+		Secret: []byte(app.config.secretkey),
+	}
+
+	valid := signer.VerifyToken(testURL)
+	if valid {
+		w.Write([]byte("valid"))
+	} else {
+		w.Write([]byte("invalid"))
+	}
+
+	if err := app.renderTemplate(w, r, "reset-password", &templateData{}); err != nil {
 		app.errorLog.Println(err)
 	}
 }
