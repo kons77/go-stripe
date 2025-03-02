@@ -31,6 +31,8 @@ type config struct {
 		username string
 		password string
 	}
+	secretkey string // secret key to sign reset password link
+	frontend  string // url to frontend
 }
 
 // Application struct (holds app configuration)
@@ -69,6 +71,8 @@ func main() {
 	flag.StringVar(&cfg.smtp.username, "smtpuser", "", "smtp username")
 	flag.StringVar(&cfg.smtp.password, "smtppassword", "", "smtp password")
 	//maybe AUTH and TLS
+	//flag.StringVar(&cfg.secretkey, "secret", "", "secret key")
+	flag.StringVar(&cfg.frontend, "frontend", "http://127.0.0.1:4000", "url to frontend")
 
 	flag.Parse()
 
@@ -84,6 +88,7 @@ func main() {
 	cfg.smtp.host = os.Getenv("SMTP_HOST")
 	cfg.smtp.username = os.Getenv("SMTP_USER")
 	cfg.smtp.password = os.Getenv("SMTP_PASWORD")
+	cfg.secretkey = os.Getenv("SIGN_KEY")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)

@@ -19,6 +19,7 @@ Learn how to build a secure ecommerce application with Go (go-stripe)
 - [MySQL Driver](https://github.com/go-sql-driver/mysql) - Go MySQL Driver
 - [Soda CLI](https://gobuffalo.io/documentation/database/soda/) - database migrations
 - [Go Simple Mail](https://github.com/xhit/go-simple-mail) - sending emails
+- [BW Marin Go alone](https://github.com/bwmarrin/go-alone) - Go MAC signer
 
 ### UI Components
 - [Stripe Virtual Terminal](https://dashboard.stripe.com/) - integrates the Stripe Virtual Terminal for processing payments 
