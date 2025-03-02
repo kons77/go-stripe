@@ -25,6 +25,12 @@ type config struct {
 		secret string
 		key    string
 	}
+	smtp struct {
+		host     string
+		port     int
+		username string
+		password string
+	}
 }
 
 // Application struct (holds app configuration)
@@ -54,9 +60,15 @@ func (app *application) serve() error {
 func main() {
 	var cfg config
 
+	// set flags
 	flag.IntVar(&cfg.port, "port", 4001, "Server port to listen on")
 	flag.StringVar(&cfg.env, "env", "development", "Applicetion environment {development|production|maintenance}")
 	flag.StringVar(&cfg.db.dsn, "dsn", "", "Database DSN connection string")
+	flag.StringVar(&cfg.smtp.host, "smtphost", "", "smtp host")
+	flag.IntVar(&cfg.smtp.port, "port", 587, "SMTP port")
+	flag.StringVar(&cfg.smtp.username, "smtpuser", "", "smtp username")
+	flag.StringVar(&cfg.smtp.password, "smtppassword", "", "smtp password")
+	//maybe AUTH and TLS
 
 	flag.Parse()
 
@@ -65,19 +77,25 @@ func main() {
 		log.Println("Cannot load .env file", err)
 	}
 
+	// read from .env
 	cfg.stripe.secret = os.Getenv("STRIPE_SECRET")
 	cfg.stripe.key = os.Getenv("STRIPE_KEY")
 	cfg.db.dsn = os.Getenv("DSN")
+	cfg.smtp.host = os.Getenv("SMTP_HOST")
+	cfg.smtp.username = os.Getenv("SMTP_USER")
+	cfg.smtp.password = os.Getenv("SMTP_PASWORD")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
+	// create db connection
 	conn, err := driver.OpenDB(cfg.db.dsn)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 	defer conn.Close()
 
+	// set app config values
 	app := &application{
 		config:   cfg,
 		infoLog:  infoLog,
