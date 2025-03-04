@@ -1,2 +1,0 @@
-sql("insert into widgets (name, description, inventory_level, price, created_at, updated_at) 
-values ('Bronze Plan', 'Get three widgets for the price of two every month', 100000, 2000, now(), now());")
