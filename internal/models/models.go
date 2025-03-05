@@ -315,7 +315,9 @@ func (m *DBModel) UpdatePasswordForUser(u User, hash string) error {
 
 	return nil
 }
-func (m *DBModel) GetAllOrders() ([]*Order, error) {
+
+// GetAllOrders returns all orders if isReccuring = 0 or all subscriptions if isReccuring = 1
+func (m *DBModel) GetAllOrders(isReccuring int) ([]*Order, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -333,12 +335,12 @@ func (m *DBModel) GetAllOrders() ([]*Order, error) {
 		left join transactions t on (o.transaction_id = t.id)
 		left join customers c on (o.customer_id = c.id)
 	where 
-		w.is_recurring = 0	
+		w.is_recurring = ?	
 	order by 
 		o.created_at desc
 	`
 
-	rows, err := m.DB.QueryContext(ctx, query)
+	rows, err := m.DB.QueryContext(ctx, query, isReccuring)
 	if err != nil {
 		return nil, err
 	}
