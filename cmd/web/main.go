@@ -66,7 +66,7 @@ func (app *application) serve() error {
 }
 
 func main() {
-	gob.Register(TrasactionData{})
+	gob.Register(TransactionData{})
 
 	var cfg config
 

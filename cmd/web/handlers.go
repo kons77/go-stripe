@@ -27,7 +27,7 @@ func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-type TrasactionData struct {
+type TransactionData struct {
 	FirstName       string
 	LastName        string
 	Email           string
@@ -42,8 +42,8 @@ type TrasactionData struct {
 }
 
 // GetTransactionData gets transaction data from post and stripe
-func (app *application) GetTransactionData(r *http.Request) (TrasactionData, error) {
-	var txnData TrasactionData
+func (app *application) GetTransactionData(r *http.Request) (TransactionData, error) {
+	var txnData TransactionData
 
 	err := r.ParseForm()
 	if err != nil {
@@ -85,7 +85,7 @@ func (app *application) GetTransactionData(r *http.Request) (TrasactionData, err
 	expiryMonth := pm.Card.ExpMonth
 	expiryYear := pm.Card.ExpYear
 
-	txnData = TrasactionData{
+	txnData = TransactionData{
 		FirstName:       firstName,
 		LastName:        lastName,
 		Email:           email,
@@ -128,16 +128,16 @@ func (app *application) PaymentSecceeded(w http.ResponseWriter, r *http.Request)
 	}
 
 	// create a new transaction
-	txn := models.Trasaction{
-		Amount:             txnData.PaymentAmount,
-		Currency:           txnData.PaymentCurrency,
-		LastFour:           txnData.LastFour,
-		ExpiryMonth:        txnData.ExpiryMonth,
-		ExpiryYear:         txnData.ExpiryYear,
-		PaymentIntent:      txnData.PaymentIntentID,
-		PaymentMethod:      txnData.PaymentMethodID,
-		BankReturnCode:     txnData.BankReturnCode,
-		TrasactionStatusID: 2, //cleared
+	txn := models.Transaction{
+		Amount:              txnData.PaymentAmount,
+		Currency:            txnData.PaymentCurrency,
+		LastFour:            txnData.LastFour,
+		ExpiryMonth:         txnData.ExpiryMonth,
+		ExpiryYear:          txnData.ExpiryYear,
+		PaymentIntent:       txnData.PaymentIntentID,
+		PaymentMethod:       txnData.PaymentMethodID,
+		BankReturnCode:      txnData.BankReturnCode,
+		TransactionStatusID: 2, //cleared
 	}
 
 	txnID, err := app.SaveTransaction(txn)
@@ -148,14 +148,14 @@ func (app *application) PaymentSecceeded(w http.ResponseWriter, r *http.Request)
 
 	// create a new order
 	order := models.Order{
-		WidgetID:     widgetID,
-		TrasactionID: txnID,
-		CustomerID:   customerID,
-		StatusID:     1, //cleared
-		Quantity:     1,
-		Amount:       txnData.PaymentAmount,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
+		WidgetID:      widgetID,
+		TransactionID: txnID,
+		CustomerID:    customerID,
+		StatusID:      1, //cleared
+		Quantity:      1,
+		Amount:        txnData.PaymentAmount,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
 	_, err = app.SaveOrder(order)
@@ -178,16 +178,16 @@ func (app *application) VirtualTerminalPaymentSecceeded(w http.ResponseWriter, r
 	}
 
 	// create a new transaction
-	txn := models.Trasaction{
-		Amount:             txnData.PaymentAmount,
-		Currency:           txnData.PaymentCurrency,
-		LastFour:           txnData.LastFour,
-		ExpiryMonth:        txnData.ExpiryMonth,
-		ExpiryYear:         txnData.ExpiryYear,
-		PaymentIntent:      txnData.PaymentIntentID,
-		PaymentMethod:      txnData.PaymentMethodID,
-		BankReturnCode:     txnData.BankReturnCode,
-		TrasactionStatusID: 2, //cleared
+	txn := models.Transaction{
+		Amount:              txnData.PaymentAmount,
+		Currency:            txnData.PaymentCurrency,
+		LastFour:            txnData.LastFour,
+		ExpiryMonth:         txnData.ExpiryMonth,
+		ExpiryYear:          txnData.ExpiryYear,
+		PaymentIntent:       txnData.PaymentIntentID,
+		PaymentMethod:       txnData.PaymentMethodID,
+		BankReturnCode:      txnData.BankReturnCode,
+		TransactionStatusID: 2, //cleared
 	}
 
 	_, err = app.SaveTransaction(txn)
@@ -203,7 +203,7 @@ func (app *application) VirtualTerminalPaymentSecceeded(w http.ResponseWriter, r
 
 // Receipt
 func (app *application) Receipt(w http.ResponseWriter, r *http.Request) {
-	txn := app.Session.Get(r.Context(), "receipt").(TrasactionData)
+	txn := app.Session.Get(r.Context(), "receipt").(TransactionData)
 	data := make(map[string]interface{})
 	data["txn"] = txn
 	app.Session.Remove(r.Context(), "receipt")
@@ -217,7 +217,7 @@ func (app *application) Receipt(w http.ResponseWriter, r *http.Request) {
 
 // VirtualTerminalReceipt
 func (app *application) VirtualTerminalReceipt(w http.ResponseWriter, r *http.Request) {
-	txn := app.Session.Get(r.Context(), "receipt").(TrasactionData)
+	txn := app.Session.Get(r.Context(), "receipt").(TransactionData)
 	data := make(map[string]interface{})
 	data["txn"] = txn
 	app.Session.Remove(r.Context(), "receipt")
@@ -252,7 +252,7 @@ func (app *application) SaveCustomer(firstName, lastName, email string) (int, er
 }
 
 // SaveTransaction saves a transaction and returns id
-func (app *application) SaveTransaction(txn models.Trasaction) (int, error) {
+func (app *application) SaveTransaction(txn models.Transaction) (int, error) {
 	id, err := app.DB.InsertTransaction(txn)
 	if err != nil {
 		return 0, err

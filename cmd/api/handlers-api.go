@@ -164,13 +164,13 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 		amount, _ := strconv.Atoi(data.Amount)
 		// expiryMonth := data.ExpiryMonth
 		// expiryYear := data.ExpiryYear
-		txn := models.Trasaction{
-			Amount:             amount,
-			Currency:           "usd",
-			LastFour:           data.LastFour,
-			ExpiryMonth:        data.ExpiryMonth,
-			ExpiryYear:         data.ExpiryYear,
-			TrasactionStatusID: 2,
+		txn := models.Transaction{
+			Amount:              amount,
+			Currency:            "usd",
+			LastFour:            data.LastFour,
+			ExpiryMonth:         data.ExpiryMonth,
+			ExpiryYear:          data.ExpiryYear,
+			TransactionStatusID: 2,
 		}
 
 		txnID, err := app.SaveTransaction(txn)
@@ -181,14 +181,14 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 		// create order
 		order := models.Order{
-			WidgetID:     productID,
-			TrasactionID: txnID,
-			CustomerID:   customerID,
-			StatusID:     1,
-			Quantity:     1,
-			Amount:       amount,
-			CreatedAt:    time.Now(),
-			UpdatedAt:    time.Now(),
+			WidgetID:      productID,
+			TransactionID: txnID,
+			CustomerID:    customerID,
+			StatusID:      1,
+			Quantity:      1,
+			Amount:        amount,
+			CreatedAt:     time.Now(),
+			UpdatedAt:     time.Now(),
 		}
 
 		_, err = app.SaveOrder(order)
@@ -230,7 +230,7 @@ func (app *application) SaveCustomer(firstName, lastName, email string) (int, er
 }
 
 // SaveTransaction saves a transaction and returns id
-func (app *application) SaveTransaction(txn models.Trasaction) (int, error) {
+func (app *application) SaveTransaction(txn models.Transaction) (int, error) {
 	id, err := app.DB.InsertTransaction(txn)
 	if err != nil {
 		return 0, err
@@ -400,16 +400,16 @@ func (app *application) VirtualTerminalPaymentSucceeded(w http.ResponseWriter, r
 	txnData.ExpiryMonth = int(pm.Card.ExpMonth)
 	txnData.ExpiryYear = int(pm.Card.ExpYear)
 
-	txn := models.Trasaction{
-		Amount:             txnData.PaymentAmount,
-		Currency:           txnData.PaymentCurrency,
-		LastFour:           txnData.LastFour,
-		ExpiryMonth:        txnData.ExpiryMonth,
-		ExpiryYear:         txnData.ExpiryYear,
-		PaymentIntent:      txnData.PaymentIntent,
-		PaymentMethod:      txnData.PaymentMethod,
-		BankReturnCode:     pi.LatestCharge.ID,
-		TrasactionStatusID: 2,
+	txn := models.Transaction{
+		Amount:              txnData.PaymentAmount,
+		Currency:            txnData.PaymentCurrency,
+		LastFour:            txnData.LastFour,
+		ExpiryMonth:         txnData.ExpiryMonth,
+		ExpiryYear:          txnData.ExpiryYear,
+		PaymentIntent:       txnData.PaymentIntent,
+		PaymentMethod:       txnData.PaymentMethod,
+		BankReturnCode:      pi.LatestCharge.ID,
+		TransactionStatusID: 2,
 	}
 
 	_, err = app.SaveTransaction(txn)
