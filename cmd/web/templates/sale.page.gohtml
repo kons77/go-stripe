@@ -1,11 +1,11 @@
 {{template "base" .}}
 
 {{define "title"}}
-  Sale
+  {{index .StringMap "title"}}
 {{end}}
 
 {{define "content"}}
-  <h2 class="mt-5">Sale</h2>
+  <h2 class="mt-5">{{index .StringMap "title"}}</h2>
   <hr>
 
   <div>
@@ -18,7 +18,7 @@
 
   <hr>
 
-  <a class="btn btn-info" href="/admin/all-sales">Cancel</a>
+  <a class="btn btn-info" href='{{index .StringMap "cancel"}}'>Cancel</a>
   <a class="btn btn-warning" href="#!">Refund Order</a>
 
 {{end}}
@@ -52,13 +52,7 @@
     }
   }) 
 
-  function formatCurrency(amount){
-    let c = parseFloat(amount/100);
-    return c.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    })
-  }
+  
 
 </script>
 {{end}}

@@ -99,6 +99,14 @@
         loginLink.classList.remove("d-none");
       })*/
 
+      function formatCurrency(amount){
+        let c = parseFloat(amount/100);
+        return c.toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+        })
+      }
+
       function logout() {
         localStorage.removeItem("token");
         localStorage.removeItem("token_expiry");

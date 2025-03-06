@@ -18,10 +18,11 @@ func (app *application) routes() http.Handler {
 		mux.Get("/all-sales", app.AllSales)
 		mux.Get("/all-subscriptions", app.AllSubscriptions)
 		mux.Get("/sales/{id}", app.ShowSale)
+		mux.Get("/subscription/{id}", app.ShowSubscription)
 	})
 
 	mux.Get("/widget/{id}", app.ChargeOnce)
-	mux.Post("/payment-succeeded", app.PaymentSecceeded)
+	mux.Post("/payment-succeeded", app.PaymentSucceeded)
 	mux.Get("/receipt", app.Receipt)
 
 	mux.Get("/plans/bronze", app.BronzePlan)

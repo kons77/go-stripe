@@ -48,7 +48,7 @@
         let newRow = tbody.insertRow();
         let newCell = newRow.insertCell();
 
-        newCell.innerHTML = `<a href="/admin/sales/${i.id}">Order ${i.id}</a>`;
+        newCell.innerHTML = `<a href="/admin/subscription/${i.id}">Order ${i.id}</a>`;
         
         newCell = newRow.insertCell();
         let item = document.createTextNode(i.customer.last_name + " " + i.customer.first_name);
@@ -70,14 +70,6 @@
       newCell.innerHTML = "No data available"
     }    
   })
-
-  function formatCurrency(amount){
-    let c = parseFloat(amount/100);
-    return c.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    })
-  }
 
 </script>
 {{end}}
