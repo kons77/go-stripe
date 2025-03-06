@@ -68,16 +68,16 @@
       let newCell = newRow.insertCell();
       newCell.setAttribute("colspan", "4");
       newCell.innerHTML = "No data available"
-    }
-
-    function formatCurrency(amount){
-      let c = parseFloat(amount/100);
-      return c.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-      })
-    }
+    }    
   })
+
+  function formatCurrency(amount){
+    let c = parseFloat(amount/100);
+    return c.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+    })
+  }
 
 </script>
 {{end}}
