@@ -23,3 +23,8 @@ https://dashboard.stripe.com/test/payments
 The Stripe Customer object 
 https://docs.stripe.com/api/customers/object
 
+Refund and cancel payments
+https://docs.stripe.com/refunds
+
+The Refund object 
+https://docs.stripe.com/api/refunds/object
