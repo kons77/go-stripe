@@ -122,6 +122,7 @@ func (c *Card) CreateCustomer(pm, email string) (*stripe.Customer, string, error
 	return cust, "", nil
 }
 
+// Refund an amount for a paymentIntent
 func (c *Card) Refund(pi string, amount int) error {
 	stripe.Key = c.Secret
 	amountToRefund := int64(amount)
@@ -139,6 +140,22 @@ func (c *Card) Refund(pi string, amount int) error {
 	return nil
 }
 
+// CancelSubscription cancel
+func (c *Card) CancelSubscription(subID string) error {
+	stripe.Key = c.Secret
+
+	params := &stripe.SubscriptionParams{
+		CancelAtPeriodEnd: stripe.Bool(true),
+	}
+
+	_, err := subscription.Update(subID, params)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// cardErrorMessage returns human readable version of card error messages
 func cardErrorMessage(code stripe.ErrorCode) string {
 	var msg = ""
 	switch code {

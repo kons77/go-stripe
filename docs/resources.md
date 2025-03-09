@@ -6,7 +6,7 @@ What are floating point errors?
 https://blog.penjee.com/what-are-floating-point-errors-answered/
 
 
-## Stripe links 
+## Stripe docs  
 
 Stripe API Keys
 https://dashboard.stripe.com/test/apikeys
@@ -28,3 +28,6 @@ https://docs.stripe.com/refunds
 
 The Refund object 
 https://docs.stripe.com/api/refunds/object
+
+Cancel subscriptions
+https://docs.stripe.com/billing/subscriptions/cancel
