@@ -1,7 +1,7 @@
 {{template "base" .}}
 
 {{define "titile"}}
-    All Sales
+  {{index .StringMap "title"}}
 {{end}}
 
 {{define "content"}}
@@ -53,11 +53,12 @@ function paginator(pages, curPage) {
   for (var j = 0; j < pageBtns.length; j++) {
     pageBtns[j].addEventListener("click", function(evt){
       let desirePage = evt.target.getAttribute("data-page");
-      //console.log("clicked, and data-page is", desirePage);
+      //console.log("clicked, and data-page is", desirePage);      
       if ((desirePage > 0) && (desirePage <= pages + 1)) {
         //console.log("would go to page", desirePage);
         updateTable(pageSize, desirePage);
       }
+      
     })
   }
 }
@@ -100,41 +101,30 @@ function updateTable(pgSize, curPage) {
     // check if no sales 
     if (data.orders) {
         data.orders.forEach(function(i){
-        let newRow = tbody.insertRow();
-        let newCell = newRow.insertCell();
+        let newRow = tbody.insertRow();        
 
-        newCell.innerHTML = `<a href="/admin/${saleOrSubscr}/${i.id}">Order ${i.id}</a>`;
-        
-        newCell = newRow.insertCell();
-        let item = document.createTextNode(i.customer.last_name + " " + i.customer.first_name);
-        newCell.appendChild(item);
+        newRow.insertCell().innerHTML = `<a href="/admin/${saleOrSubscr}/${i.id}">Order ${i.id}</a>`;
+        newRow.insertCell().innerHTML = `${i.customer.last_name} ${i.customer.first_name}`;
+        newRow.insertCell().innerHTML = i.widget.name;
+        newRow.insertCell().innerHTML = formatCurrency(i.transaction.amount);
 
-        newCell = newRow.insertCell();
-        item = document.createTextNode(i.widget.name);
-        newCell.appendChild(item);
-
-        let cur = formatCurrency(i.transaction.amount);
-        newCell = newRow.insertCell();
-        item = document.createTextNode(cur);
-        newCell.appendChild(item);
-
-        newCell = newRow.insertCell();
-        item = document.createTextNode(status);        
+        let statusHTML;              
         switch (i.status_id ) {
           case 1: 
-            newCell.innerHTML = `<span class="badge bg-success">Charged</span>`;
+            statusHTML = `<span class="badge bg-success">Charged</span>`;
             break;
           case 2:
-            newCell.innerHTML = `<span class="badge bg-danger">Refunded</span>`;
+            statusHTML = `<span class="badge bg-danger">Refunded</span>`;
             break;
           case 3:
-            newCell.innerHTML = `<span class="badge bg-danger">Canceled</span>`;
+            statusHTML = `<span class="badge bg-danger">Canceled</span>`;
             break;
           default:
-            newCell.innerHTML = `<span class="badge bg-danger">Unknown</span>`;
+            statusHTML = `<span class="badge bg-danger">Unknown</span>`;
             break;
         }        
-        // newCell.appendChild(item);
+        newRow.insertCell().innerHTML = statusHTML;
+
       })
       paginator(data.last_page, data.current_page)
     } else {
