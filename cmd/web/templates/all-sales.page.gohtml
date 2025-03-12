@@ -65,6 +65,7 @@ function paginator(pages, curPage) {
 function updateTable(pgSize, curPage) {
   let token = localStorage.getItem("token");
   let tbody = document.getElementById("sales-table").getElementsByTagName("tbody")[0];
+  tbody.innerHTML = ""
 
   let body = {
     page_size: parseInt(pgSize, 10),
@@ -82,7 +83,7 @@ function updateTable(pgSize, curPage) {
   }
 
   fetch("{{.API}}/api/admin/all-sales", requestOptions)
-  .then(responce => responce.json())
+  .then(response => response.json())
   .then(function(data){
     //console.log(data);
 
