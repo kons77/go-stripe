@@ -68,8 +68,7 @@
 
     fetch("{{.API}}/api/admin/get-sale/" + id, requestOptions)
     .then(responce => responce.json())
-    .then(function(data){
-      console.log(data);
+    .then(function(data){      
 
       if (data) {
         document.getElementById("order-no").innerHTML = data.id;
@@ -138,9 +137,7 @@
             document.getElementById("charged").classList.add("d-none");
           }
         })
-
-
-
+        
       }
     });
 

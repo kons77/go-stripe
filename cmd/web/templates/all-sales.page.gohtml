@@ -5,7 +5,7 @@
 {{end}}
 
 {{define "content"}}
-  <h2 class="mt-5">All Sales</h2>
+  <h2 class="mt-5">{{index .StringMap "title"}}</h2>
   <hr>
 
   <table id="sales-table" class="table table-striped">
@@ -53,9 +53,9 @@ function paginator(pages, curPage) {
   for (var j = 0; j < pageBtns.length; j++) {
     pageBtns[j].addEventListener("click", function(evt){
       let desirePage = evt.target.getAttribute("data-page");
-      console.log("clicked, and data-page is", desirePage);
+      //console.log("clicked, and data-page is", desirePage);
       if ((desirePage > 0) && (desirePage <= pages + 1)) {
-        console.log("would go to page", desirePage);
+        //console.log("would go to page", desirePage);
         updateTable(pageSize, desirePage);
       }
     })
@@ -65,11 +65,23 @@ function paginator(pages, curPage) {
 function updateTable(pgSize, curPage) {
   let token = localStorage.getItem("token");
   let tbody = document.getElementById("sales-table").getElementsByTagName("tbody")[0];
+
   tbody.innerHTML = ""
+
+  // build URLs depend on sales or subscription 
+  let allSalesURL = '{{index .StringMap "all-sls-sbscr-url"}}';
+  if ( allSalesURL.includes("all-sales") ) {    
+    saleOrSubscr = 'sale';
+    isReccuring = 0;    
+  } else {
+    saleOrSubscr = 'subscription';
+    isReccuring = 1;    
+  }
 
   let body = {
     page_size: parseInt(pgSize, 10),
     page: parseInt(curPage, 10),
+    is_recur: isReccuring,
   }
   
   const requestOptions = {
@@ -80,20 +92,18 @@ function updateTable(pgSize, curPage) {
       'Authorization': 'Bearer ' + token,
     },
     body: JSON.stringify(body),
-  }
+  }  
 
-  fetch("{{.API}}/api/admin/all-sales", requestOptions)
+  fetch('{{.API}}' + allSalesURL, requestOptions)
   .then(response => response.json())
   .then(function(data){
-    //console.log(data);
-
     // check if no sales 
     if (data.orders) {
         data.orders.forEach(function(i){
         let newRow = tbody.insertRow();
         let newCell = newRow.insertCell();
 
-        newCell.innerHTML = `<a href="/admin/sales/${i.id}">Order ${i.id}</a>`;
+        newCell.innerHTML = `<a href="/admin/${saleOrSubscr}/${i.id}">Order ${i.id}</a>`;
         
         newCell = newRow.insertCell();
         let item = document.createTextNode(i.customer.last_name + " " + i.customer.first_name);
@@ -109,16 +119,22 @@ function updateTable(pgSize, curPage) {
         newCell.appendChild(item);
 
         newCell = newRow.insertCell();
-        if (i.status_id != 1) {
-          item = document.createTextNode(status);
-          newCell.innerHTML = `<span class="badge bg-danger">Refunded</span>` ;  
-          
-        } else {
-          newCell.innerHTML = `<span class="badge bg-success">Charged</span>` ;
-          item = document.createTextNode(status);
-          
-        }
-        newCell.appendChild(item);
+        item = document.createTextNode(status);        
+        switch (i.status_id ) {
+          case 1: 
+            newCell.innerHTML = `<span class="badge bg-success">Charged</span>`;
+            break;
+          case 2:
+            newCell.innerHTML = `<span class="badge bg-danger">Refunded</span>`;
+            break;
+          case 3:
+            newCell.innerHTML = `<span class="badge bg-danger">Canceled</span>`;
+            break;
+          default:
+            newCell.innerHTML = `<span class="badge bg-danger">Unknown</span>`;
+            break;
+        }        
+        // newCell.appendChild(item);
       })
       paginator(data.last_page, data.current_page)
     } else {
@@ -133,7 +149,6 @@ function updateTable(pgSize, curPage) {
 document.addEventListener("DOMContentLoaded", function(){
   updateTable(pageSize, currentPage);
 })
-
 
 </script>
 {{end}}

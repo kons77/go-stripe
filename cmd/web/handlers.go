@@ -405,13 +405,25 @@ func (app *application) ShowResetPassword(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
-	if err := app.renderTemplate(w, r, "all-sales", &templateData{}); err != nil {
+	stringMap := make(map[string]string)
+	stringMap["title"] = "All Sales"
+	stringMap["all-sls-sbscr-url"] = "/api/admin/all-sales"
+
+	if err := app.renderTemplate(w, r, "all-sales", &templateData{
+		StringMap: stringMap,
+	}); err != nil {
 		app.errorLog.Println(err)
 	}
 }
 
 func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request) {
-	if err := app.renderTemplate(w, r, "all-subscriptions", &templateData{}); err != nil {
+	stringMap := make(map[string]string)
+	stringMap["title"] = "All Subscriptions"
+	stringMap["all-sls-sbscr-url"] = "/api/admin/all-subscriptions"
+
+	if err := app.renderTemplate(w, r, "all-sales", &templateData{
+		StringMap: stringMap,
+	}); err != nil {
 		app.errorLog.Println(err)
 	}
 }
