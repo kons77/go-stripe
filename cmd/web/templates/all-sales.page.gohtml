@@ -39,13 +39,18 @@ let pageSize = 4;
 function paginator(pages, curPage) {
   let pgntr = document.getElementById("paginator");
 
-  let html = `<li class="page-item"><a href="#!" class="page-link pager" data-page="${curPage - 1}">&lt;</a></li>`;
+  let prevDisabled = parseInt(curPage) <= 1 ? "disabled" : ""
+  let nextDisabled = parseInt(curPage) >= pages + 1 ? "disabled" : ""
+
+  let html = `<li class="page-item ${prevDisabled}"><a href="#!" class="page-link pager" data-page="${curPage - 1}">&lt;</a></li>`;
 
   for (var i=0 ; i<=pages; i++) {
-    html += `<li class="page-item"><a href="#!" class="page-link pager" data-page="${i + 1}">${i + 1}</a></li>`;
+    let activeClass = (i+1) === parseInt(curPage) ? "active" : ""
+
+    html += `<li class="page-item ${activeClass}"><a href="#!" class="page-link pager" data-page="${i + 1}">${i + 1}</a></li>`;
   }
 
-  html += `<li class="page-item"><a href="#!" class="page-link pager" data-page="${curPage + 1}">&gt;</a></li>`;
+  html += `<li class="page-item ${nextDisabled}"><a href="#!" class="page-link pager" data-page="${curPage + 1}">&gt;</a></li>`;
 
   pgntr.innerHTML = html;
 
@@ -53,7 +58,7 @@ function paginator(pages, curPage) {
   for (var j = 0; j < pageBtns.length; j++) {
     pageBtns[j].addEventListener("click", function(evt){
       let desirePage = evt.target.getAttribute("data-page");
-      //console.log("clicked, and data-page is", desirePage);      
+      //console.log("clicked, and data-page is", desirePage);       
       if ((desirePage > 0) && (desirePage <= pages + 1)) {
         //console.log("would go to page", desirePage);
         updateTable(pageSize, desirePage);
@@ -66,6 +71,7 @@ function paginator(pages, curPage) {
 function updateTable(pgSize, curPage) {
   let token = localStorage.getItem("token");
   let tbody = document.getElementById("sales-table").getElementsByTagName("tbody")[0];
+  let saleOrSubscr, isReccuring;
 
   tbody.innerHTML = ""
 
