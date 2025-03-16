@@ -614,5 +614,13 @@ func (m *DBModel) DeleteUser(id int) error {
 		return err
 	}
 
+	// no foreing key between users and tokens so do it manually
+	stmt = `delete from tokens where user_id = ?`
+
+	_, err = m.DB.ExecContext(ctx, stmt, id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
