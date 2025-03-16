@@ -31,25 +31,35 @@ build_back:
 	@go build -o dist/gostripe_api.exe ./cmd/api
 	@echo Back end built!
 
+## build_invoice: builds the invoice microservice
+build_invoice:
+	@echo Building invoice microservice...
+	@go build -o dist/invoice.exe ./cmd/micro/invoice
+	@echo Invoice microservice built!
+
 ## start: starts front and back end
-start: start_front start_back
+start: start_front start_back start_invoice
 
 ## start_front: starts the front end
 start_front: build_front
 	@echo Starting the front end...
 	@set STRIPE_KEY=${STRIPE_KEY}&& set STRIPE_SECRET=${STRIPE_SECRET}&& start /B .\dist\gostripe.exe
-##	start /B .\dist\gostripe.exe
 	@echo Front end running!
 
 ## start_back: starts the back end
 start_back: build_back
 	@echo Starting the back end...
 	@set STRIPE_KEY=${STRIPE_KEY}&& set STRIPE_SECRET=${STRIPE_SECRET}&& start /B .\dist\gostripe_api.exe
-##	start /B .\dist\gostripe_api.exe
 	@echo Back end running!
 
+## start_invoice: starts the invoice microservice
+start_invoice: build_invoice
+	@echo "Starting the invoicing microservice..."
+	@set STRIPE_KEY=${STRIPE_KEY}&& start /B .\dist\invoice.exe
+	@echo "Invoicing microservice running!"
+
 ## stop: stops the front and back end
-stop: stop_front stop_back
+stop: stop_front stop_back stop_invoice
 	@echo All applications stopped
 
 ## stop_front: stops the front end
@@ -63,3 +73,9 @@ stop_back:
 	@echo Stopping the back end...
 	@taskkill /IM gostripe_api.exe /F
 	@echo Stopped back end
+
+## stop_invoice: stops the front end
+stop_invoice:
+	@echo "Stopping the invoicing microservice..."
+	@taskkill /IM invoice.exe /F
+	@echo "Stopped invoicing microservice"
