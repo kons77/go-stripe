@@ -20,6 +20,7 @@ Learn how to build a secure ecommerce application with Go (go-stripe)
 - [Soda CLI](https://gobuffalo.io/documentation/database/soda/) - database migrations
 - [Go Simple Mail](https://github.com/xhit/go-simple-mail) - sending emails
 - [BW Marin Go alone](https://github.com/bwmarrin/go-alone) - Go MAC signer
+- [Gorilla WebSocket](https://github.com/gorilla/websocket) -  is a Go implementation of the WebSocket protocol
 
 ### UI Components
 - [Stripe Virtual Terminal](https://dashboard.stripe.com/) - integrates the Stripe Virtual Terminal for processing payments 
