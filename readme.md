@@ -25,6 +25,8 @@ Learn how to build a secure ecommerce application with Go (go-stripe)
 ### UI Components
 - [Stripe Virtual Terminal](https://dashboard.stripe.com/) - integrates the Stripe Virtual Terminal for processing payments 
 - [Sweet Alerts 2](https://sweetalert2.github.io/#download) - pop-up dialogs
+- [Gofpdf by phpdave11](https://github.com/phpdave11/gofpdf) - pdf creator 
+- [Gofpdi by phpdave11](https://github.com/phpdave11/gofpdi)
 
 ### Development Tools
 - [Air](https://github.com/air-verse/air) - live reload for Go apps

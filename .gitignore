@@ -7,3 +7,4 @@ database.yml
 **/schema.sql
 dist/*
 dist
+invoices/*

@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+type Products struct {
+	Name     string
+	Amount   int
+	Quantity int
+}
+
 type Order struct {
 	ID        int       `json:"id"`
 	Quantity  int       `json:"quantity"`
@@ -15,6 +21,7 @@ type Order struct {
 	LastName  string    `json:"last_name"`
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"created_at"`
+	// Items     []Products `json:"items"`
 }
 
 func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Request) {
@@ -27,11 +34,35 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// generate a pdf invoice
+	/*
+		order.ID = 100
+		order.Email = "me@here.com"
+		order.FirstName = "John"
+		order.LastName = "Smith"
+		order.Quantity = 1
+		order.Amount = 1000
+		order.Product = "Widget"
+		order.CreatedAt = time.Now()
+	*/
 
-	// create mail
+	// generate a pdf invoice
+	err = app.createInvoicePDF(order)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
+
+	// create mail attachment
+	attachments := []string{
+		fmt.Sprintf("./invoices/%d.pdf", order.ID),
+	}
 
 	// send mail with attachment
+	err = app.SendMail("info@widget.com", order.Email, "Your invoice", "invoice", attachments, nil)
+	if err != nil {
+		app.badRequest(w, r, err)
+		return
+	}
 
 	// send response
 	var resp struct {
