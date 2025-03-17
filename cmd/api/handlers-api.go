@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -113,6 +114,52 @@ func (app *application) GetWidgetByID(w http.ResponseWriter, r *http.Request) {
 	w.Write(out)
 }
 
+// Invoice describes the JSON payload sent to the microservice
+type Invoice struct {
+	ID        int       `json:"id"`
+	Quantity  int       `json:"quantity"`
+	Amount    int       `json:"amount"`
+	Product   string    `json:"product"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func (app *application) callInvoiceMicro(inv Invoice) {
+	go func() {
+		url := "http://127.0.0.1:5000/invoice/create-and-send"
+		out, err := json.MarshalIndent(inv, "", "\t")
+		if err != nil {
+			app.errorLog.Println("Error marshaling invoice:", err)
+			return
+		}
+
+		// Create a client with a timeout
+		client := &http.Client{
+			Timeout: 5 * time.Second,
+		}
+
+		req, err := http.NewRequest("POST", url, bytes.NewBuffer(out))
+		if err != nil {
+			app.errorLog.Println("Error creating request to invoice microservice:", err)
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := client.Do(req)
+		if err != nil {
+			app.errorLog.Println("Error calling invoice microservice:", err)
+			return
+		}
+		defer resp.Body.Close()
+
+		app.infoLog.Println("Invoice microservice called successfully")
+
+	}()
+}
+
+// CreateCustomerAndSubscribeToPlan is the handler for subscribing to the bronze plan
 func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, r *http.Request) {
 	var data stripePayload
 	err := json.NewDecoder(r.Body).Decode(&data)
@@ -150,6 +197,8 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 
 		app.infoLog.Println("subscription id is", subscription.ID)
 	}
+
+	var ordID int
 
 	if okay {
 		// create a new customer - later need to check if customer exists then login
@@ -191,12 +240,26 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 			UpdatedAt:     time.Now(),
 		}
 
-		_, err = app.SaveOrder(order)
+		ordID, err = app.SaveOrder(order)
 		if err != nil {
 			app.errorLog.Println(err)
 			return
 		}
 	}
+
+	// call microservice
+	inv := Invoice{
+		ID:        ordID,
+		Amount:    2000,
+		Product:   "Bronze Plan monthly subscription",
+		Quantity:  1,
+		FirstName: data.FirstName,
+		LastName:  data.LastName,
+		Email:     data.Email,
+		CreatedAt: time.Now(),
+	}
+
+	app.callInvoiceMicro(inv)
 
 	resp := jsonResponce{
 		OK:      okay,
