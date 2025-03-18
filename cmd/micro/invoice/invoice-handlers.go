@@ -24,6 +24,7 @@ type Order struct {
 	// Items     []Products `json:"items"`
 }
 
+// CreateAndSendInvoice creates an invoice as a PDF, and emails it to recipient
 func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Request) {
 	// receive json
 	var order Order
@@ -33,17 +34,6 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 		app.badRequest(w, r, err)
 		return
 	}
-
-	/*
-		order.ID = 100
-		order.Email = "me@here.com"
-		order.FirstName = "John"
-		order.LastName = "Smith"
-		order.Quantity = 1
-		order.Amount = 1000
-		order.Product = "Widget"
-		order.CreatedAt = time.Now()
-	*/
 
 	// generate a pdf invoice
 	err = app.createInvoicePDF(order)

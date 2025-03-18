@@ -96,6 +96,7 @@ func main() {
 
 }
 
+// createInvoicePDF generates a PDF version of the invoice
 func (app *application) createInvoicePDF(order Order) error {
 	pdf := gofpdf.New("P", "mm", "Letter", "")
 	pdf.SetMargins(10, 13, 10)

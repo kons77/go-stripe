@@ -380,7 +380,7 @@ func (app *application) LoginPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// PostLoginPage
+// PostLoginPage handles the posted login form
 func (app *application) PostLoginPage(w http.ResponseWriter, r *http.Request) {
 	app.Session.RenewToken(r.Context())
 
@@ -403,6 +403,7 @@ func (app *application) PostLoginPage(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+// Logout logs the user out
 func (app *application) LogOut(w http.ResponseWriter, r *http.Request) {
 	app.Session.Destroy(r.Context())
 	app.Session.RenewToken(r.Context())
@@ -410,12 +411,14 @@ func (app *application) LogOut(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
+// ForgotPassword shows the forgot password page
 func (app *application) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	if err := app.renderTemplate(w, r, "forgot-password", &templateData{}); err != nil {
 		app.errorLog.Println(err)
 	}
 }
 
+// ShowResetPassword shows the reset password page (and validates url integrity)
 func (app *application) ShowResetPassword(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 
@@ -460,6 +463,7 @@ func (app *application) ShowResetPassword(w http.ResponseWriter, r *http.Request
 	}
 }
 
+// AllSales shows the all sales page
 func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
 	stringMap := make(map[string]string)
 	stringMap["title"] = "All Sales"
@@ -472,6 +476,7 @@ func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// AllSubscriptions shows all subscription page
 func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request) {
 	stringMap := make(map[string]string)
 	stringMap["title"] = "All Subscriptions"
@@ -484,6 +489,7 @@ func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// ShowSale shows one sale page
 func (app *application) ShowSale(w http.ResponseWriter, r *http.Request) {
 	stringMap := make(map[string]string)
 	stringMap["title"] = "Sale"
@@ -500,6 +506,7 @@ func (app *application) ShowSale(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ShowSubscription shows one subscription page
 func (app *application) ShowSubscription(w http.ResponseWriter, r *http.Request) {
 	stringMap := make(map[string]string)
 	stringMap["title"] = "Subscription"

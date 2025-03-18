@@ -5,6 +5,15 @@
 What are floating point errors?
 https://blog.penjee.com/what-are-floating-point-errors-answered/
 
+Unix / Linux - Signals and Traps
+https://www.tutorialspoint.com/unix/unix-signals-traps.htm
+
+Go - graceful shutdown of worker goroutines
+https://callistaenterprise.se/blogg/teknik/2019/10/05/go-worker-cancellation/
+
+A high performance, open source universal RPC framework
+https://grpc.io/
+
 
 ## Stripe docs  
 

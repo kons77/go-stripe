@@ -42,6 +42,7 @@ type jsonResponce struct {
 	ID      int    `json:"id,omitempty"`
 }
 
+// GetPaymentIntent gets a payment intent, and returns json (or error json)
 func (app *application) GetPaymentIntent(w http.ResponseWriter, r *http.Request) {
 	var payload stripePayload
 
@@ -95,6 +96,7 @@ func (app *application) GetPaymentIntent(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// GetWidgetByID gets one widget by id and returns as JSON
 func (app *application) GetWidgetByID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	widgetID, _ := strconv.Atoi(id)
@@ -127,6 +129,7 @@ type Invoice struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+// callInvoiceMicro calls the invoicing microservice
 func (app *application) callInvoiceMicro(inv Invoice) {
 	go func() {
 		url := "http://127.0.0.1:5000/invoice/create-and-send"
@@ -320,7 +323,7 @@ func (app *application) SaveOrder(order models.Order) (int, error) {
 	return id, nil
 }
 
-// CreateAuthToken
+// CreateAuthToken creates and sends an auth token, if user supplies valid information
 func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) {
 	var userInput struct {
 		Email    string `json:"email"`
@@ -380,6 +383,7 @@ func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) 
 	_ = app.writeJSON(w, http.StatusOK, payload)
 }
 
+// authenticateToken checks an auth token for validity
 func (app *application) authenticateToken(r *http.Request) (*models.User, error) {
 
 	authorizationHeader := r.Header.Get("Authorization")
@@ -406,6 +410,7 @@ func (app *application) authenticateToken(r *http.Request) (*models.User, error)
 	return user, nil
 }
 
+// CheckAuthentication checks auth status
 func (app *application) CheckAuthentication(w http.ResponseWriter, r *http.Request) {
 	// validate the token, and get associated user
 	user, err := app.authenticateToken(r)
@@ -426,6 +431,7 @@ func (app *application) CheckAuthentication(w http.ResponseWriter, r *http.Reque
 	app.writeJSON(w, http.StatusOK, payload)
 }
 
+// VirtualTerminalPaymentSucceeded displays a page with receipt information
 func (app *application) VirtualTerminalPaymentSucceeded(w http.ResponseWriter, r *http.Request) {
 	//  send JSON as the body of the post request from the front end
 	var txnData struct {
@@ -493,6 +499,7 @@ func (app *application) VirtualTerminalPaymentSucceeded(w http.ResponseWriter, r
 
 }
 
+// SendPasswordResetEmail sends an email with a signed url to allow user to reset password
 func (app *application) SendPasswordResetEmail(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		Email string `json:"email"`
@@ -550,6 +557,7 @@ func (app *application) SendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 	app.writeJSON(w, http.StatusCreated, resp)
 }
 
+// ResetPassword resets a user's password in the database
 func (app *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		Email    string `json:"email"`
@@ -602,6 +610,7 @@ func (app *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// AllSales returns all sales or all subscriptions as a slice
 func (app *application) AllSalesSubscription(w http.ResponseWriter, r *http.Request) {
 	var payload struct {
 		PageSize    int `json:"page_size"`
@@ -640,18 +649,7 @@ func (app *application) AllSalesSubscription(w http.ResponseWriter, r *http.Requ
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
-/*
-func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request) {
-	allSales, err := app.DB.GetAllOrders(1)
-	if err != nil {
-		app.badRequest(w, r, err)
-		return
-	}
-
-	app.writeJSON(w, http.StatusOK, allSales)
-}
-*/
-
+// GetSale returns one sale as json, by id
 func (app *application) GetSale(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	orderID, _ := strconv.Atoi(id)
@@ -665,6 +663,7 @@ func (app *application) GetSale(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, order)
 }
 
+// RefundCharge accepts a json payload and tries to refund a charge
 func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 	var chargeToRefund struct {
 		ID            int    `json:"id"`
@@ -712,6 +711,7 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// CancelSubscription is the handler to cancel a subscription
 func (app *application) CancelSubscription(w http.ResponseWriter, r *http.Request) {
 	var subToCancel struct {
 		ID            int    `json:"id"`
@@ -756,6 +756,7 @@ func (app *application) CancelSubscription(w http.ResponseWriter, r *http.Reques
 
 }
 
+// AllUsers returns a JSON file listing all admin users
 func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
 	allUsers, err := app.DB.GetAllUsers()
 	if err != nil {
@@ -766,6 +767,7 @@ func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, allUsers)
 }
 
+// OneUser gets one user by id (from the url) and returns it as JSON
 func (app *application) OneUser(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	userID, err := strconv.Atoi(id)
@@ -783,6 +785,7 @@ func (app *application) OneUser(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, user)
 }
 
+// EditUser is the handler for adding or editing an existing user
 func (app *application) EditUser(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	userID, err := strconv.Atoi(id)
@@ -844,6 +847,7 @@ func (app *application) EditUser(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, resp)
 }
 
+// DeleteUser deletes a user, and all associated tokens, from the database
 func (app *application) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	userID, err := strconv.Atoi(id)
