@@ -26,9 +26,12 @@
     <hr> 
   
     <div class="mb-3">
-      <label for="first-name" class="form-label">First Name</label>
-      <input type="text" class="form-control" id="first-name" name="first_name"
-      required="" autocomplete="first-name-new">
+      <label for="first_name" class="form-label">First Name</label>
+      <input type="text" class="form-control" id="first_name" name="first_name"
+      required="" autocomplete="first_name-new"> 
+      <div id="first_name-help" class="valid-feedback">
+        Look good! 
+      </div>
     </div>
 
     <div class="mb-3">
@@ -86,7 +89,7 @@
   let stripe;
   const cardMessages = document.getElementById("card-messages");
   const payButton = document.getElementById("pay-button")
-  const porcessing = document.getElementById("processing-payment")
+  const processing = document.getElementById("processing-payment")
   
   //  initialize with my publishable key
   stripe = Stripe("{{.StripePublishableKey}}")
@@ -94,12 +97,12 @@
   // prevent user to click on the pay button twice 
   function hidePayButton() {
     payButton.classList.add("d-none");
-    porcessing.classList.remove("d-none");
+    processing.classList.remove("d-none");
   }
   
   function showPayButton() {
     payButton.classList.remove("d-none");
-    porcessing.classList.add("d-none");
+    processing.classList.add("d-none");
   }
 
   function showCardError(msg) {
@@ -152,7 +155,7 @@
         card_brand: result.paymentMethod.card.brand,
         exp_month: result.paymentMethod.card.exp_month,
         exp_year: result.paymentMethod.card.exp_year,
-        first_name: document.getElementById("first-name").value,
+        first_name: document.getElementById("first_name").value,
         last_name: document.getElementById("last-name").value,
         amount: document.getElementById("amount").value,
       }
@@ -168,18 +171,31 @@
 
       fetch("{{.API}}/api/create-customer-and-subscribe-to-plan", requestOptions)
       .then(response => response.json())
-      .then(function(data) {
-        console.log(data);
-        porcessing.classList.add("d-none");
-        showCardSuccess();
+      .then(function(data) {        
+        if (data.ok === true) {                  
+          processing.classList.add("d-none");
+          showCardSuccess();
+          sessionStorage.first_name = document.getElementById("first_name").value;
+          sessionStorage.last_name = document.getElementById("last-name").value;
+          sessionStorage.amount = "{{formatCurrency $widget.Price}}";
+          sessionStorage.last_four = payload.last_four;
 
-        sessionStorage.first_name = document.getElementById("first-name").value;
-        sessionStorage.last_name = document.getElementById("last-name").value;
-        sessionStorage.amount = "{{formatCurrency $widget.Price}}";
-        sessionStorage.last_four = result.paymentMethod.card.last4;
+          location.href = "/receipt/bronze";
+        } else {
+          document.getElementById("charge_form").classList.remove("was-validated")
 
-        location.href = "/receipt/bronze";
+          Object.entries(data.errors).forEach((i) => {
+            const [key, value] = i;
+            // console.log(`${key}: ${value}`);
+            document.getElementById(key).classList.add("is-invalid");
+            document.getElementById(key + "-help").classList.remove("valid-feedback");
+            document.getElementById(key + "-help").classList.add("invalid-feedback");
+            document.getElementById(key + "-help").innerText = value;
+          })
+          showPayButton();
+        }
       })
+      
     }
   }
 
