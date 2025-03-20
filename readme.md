@@ -18,6 +18,9 @@ Learn how to build a secure ecommerce application with Go (go-stripe)
 - [BW Marin Go alone](https://github.com/bwmarrin/go-alone) - Go MAC signer
 - [Gorilla WebSocket](https://github.com/gorilla/websocket) -  is a Go implementation of the WebSocket protocol
 
+### SMTP server
+- [Mailtrap](https://mailtrap.io/) - email testing service for capturing outgoing emails in a safe environment
+
 ### Payments 
 - [Go Stripe](https://github.com/stripe/stripe-go) - Go library for the Stripe API
 

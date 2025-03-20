@@ -679,6 +679,9 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// validate
+	/*Validate the refund amount against the order by querying the database for the order ID, retrieving the stored amount,
+	and comparing it with the amount in the JSON payload. Ensure the refund isn’t greater than the original amount,
+	or apply any other logic needed. This is a simple check you can implement on your own.*/
 
 	card := cards.Card{
 		Secret:   app.config.stripe.secret,
