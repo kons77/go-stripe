@@ -33,8 +33,21 @@
 {{define "js"}}
 <script>
 
-let currentPage = 1;
+let currentPage = localStorage.getItem("slsCurPage") || 1;
 let pageSize = 4;
+let isReccuring, saleOrSubscr; // sale 0 or subscription 1 
+
+// build URLs depend on sales or subscription 
+let allSalesURL = '{{index .StringMap "all-sls-sbscr-url"}}'; // /api/admin  /all-sales or /all-subscriptions
+
+if ( allSalesURL.includes("all-sales") ) {    
+  saleOrSubscr = 'sale';
+  isReccuring = 0;    
+} else {
+  saleOrSubscr = 'subscription';
+  isReccuring = 1;    
+}
+
 
 function paginator(pages, curPage) {
   let pgntr = document.getElementById("paginator");
@@ -61,29 +74,21 @@ function paginator(pages, curPage) {
       //console.log("clicked, and data-page is", desirePage);       
       if ((desirePage > 0) && (desirePage <= pages + 1)) {
         //console.log("would go to page", desirePage);
+        localStorage.setItem("slsCurPage", desirePage);
         updateTable(pageSize, desirePage);
-      }
-      
+      }      
     })
   }
 }
 
 function updateTable(pgSize, curPage) {
   let token = localStorage.getItem("token");
+  // store the current page in localStorage
+  localStorage.setItem("slsCurPage", curPage)
+  
   let tbody = document.getElementById("sales-table").getElementsByTagName("tbody")[0];
-  let saleOrSubscr, isReccuring;
 
   tbody.innerHTML = ""
-
-  // build URLs depend on sales or subscription 
-  let allSalesURL = '{{index .StringMap "all-sls-sbscr-url"}}';
-  if ( allSalesURL.includes("all-sales") ) {    
-    saleOrSubscr = 'sale';
-    isReccuring = 0;    
-  } else {
-    saleOrSubscr = 'subscription';
-    isReccuring = 1;    
-  }
 
   let body = {
     page_size: parseInt(pgSize, 10),
@@ -143,6 +148,24 @@ function updateTable(pgSize, curPage) {
 }
 
 document.addEventListener("DOMContentLoaded", function(){
+  // check the referrer or a custom flag to see if you came from outside the sales section
+  const referrer = document.referrer;
+
+  // if we're on the sales page but coming from subscriptions page or vice versa, reset pagination
+  if ((saleOrSubscr === 'sale' && referrer.includes("/admin/subscription")) || 
+      (saleOrSubscr === 'subscription' && referrer.includes("/admin/sale"))) {
+    localStorage.setItem("slsCurPage", 1);
+  }
+
+  // if not coming from a detail page of the current type, also reset
+  if (!referrer.includes(`/admin/${saleOrSubscr}/`)) {
+  // but only reset if not coming from the same list page (to preserve pagination on refresh)
+  if (!referrer.includes(`/admin/all-${saleOrSubscr}s`)) {
+    localStorage.setItem("slsCurPage", 1);
+  }
+  }
+
+  let currentPage = localStorage.getItem("slsCurPage") || 1;
   updateTable(pageSize, currentPage);
 })
 
