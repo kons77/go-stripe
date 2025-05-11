@@ -5,64 +5,74 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
+	"errors"
 	"io"
 )
 
 type Encryption struct {
-	Key []byte // Encryption key (must be 32 bytes)
+	Key []byte // AES encryption key (must be 16, 24, or 32 bytes for AES-128/192/256)
 }
 
-func (e *Encryption) Encrypt(text string) (string, error) {
-	plaintext := []byte(text)
-
-	block, err := aes.NewCipher(e.Key) // Create a new AES encryption block
-	if err != nil {
-		return "", err
-	}
-
-	// Create a byte slice for storing encrypted text + IV
-	cipherText := make([]byte, aes.BlockSize+len(plaintext))
-	iv := cipherText[:aes.BlockSize] // iv = Initialization Vector, First part of the array is IV
-
-	// Generate a random IV
-	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		return "", err
-	}
-
-	// Create CFB (Cipher Feedback Mode) encrypter
-	stream := cipher.NewCFBEncrypter(block, iv)
-
-	// Encrypt text
-	stream.XORKeyStream(cipherText[aes.BlockSize:], plaintext)
-
-	// Encode encrypted text in Base64 for safe transmission
-	return base64.URLEncoding.EncodeToString(cipherText), nil
-}
-
-func (e *Encryption) Decrypt(cryptoText string) (string, error) {
-	// Decode from Base64
-	cipherText, _ := base64.URLEncoding.DecodeString(cryptoText)
-
-	//Create decryption block
+// Encrypt takes a plaintext string and returns a base64-encoded AES-GCM encrypted string
+func (e *Encryption) Encrypt(plaintext string) (string, error) {
+	// Create a new AES cipher block
 	block, err := aes.NewCipher(e.Key)
 	if err != nil {
 		return "", err
 	}
 
-	// Validate the length of the encrypted text
-	if len(cipherText) < aes.BlockSize {
+	// Create a GCM (Galois/Counter Mode) instance for authenticated encryption
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
 		return "", err
 	}
 
-	// Extract IV from the first part of the array
-	iv := cipherText[:aes.BlockSize]
-	cipherText = cipherText[aes.BlockSize:]
+	// Generate a random nonce (number used once) required by GCM
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		return "", err
+	}
 
-	// Create CFB decrypter
-	stream := cipher.NewCFBDecrypter(block, iv)
+	// Seal appends the encrypted data to the nonce and authenticates it
+	ciphertext := gcm.Seal(nonce, nonce, []byte(plaintext), nil)
 
-	// Decrypt text
-	stream.XORKeyStream(cipherText, cipherText)
+	// Encode to base64 for safe storage/transmission
+	return base64.URLEncoding.EncodeToString(ciphertext), nil
+}
 
-	return string(cipherText), nil
+// Decrypt takes a base64-encoded encrypted string and returns the original plaintext
+func (e *Encryption) Decrypt(cryptoText string) (string, error) {
+	// Decode base64-encoded ciphertext
+	data, err := base64.URLEncoding.DecodeString(cryptoText)
+	if err != nil {
+		return "", err
+	}
+
+	// Create AES cipher block
+	block, err := aes.NewCipher(e.Key)
+	if err != nil {
+		return "", err
+	}
+
+	// Create GCM instance
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", err
+	}
+
+	nonceSize := gcm.NonceSize()
+	if len(data) < nonceSize {
+		return "", errors.New("ciphertext too short")
+	}
+
+	// Extract nonce and actual ciphertext
+	nonce, ciphertext := data[:nonceSize], data[nonceSize:]
+
+	// Decrypt and authenticate the data
+	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+	if err != nil {
+		return "", err
+	}
+
+	return string(plaintext), nil
 }
